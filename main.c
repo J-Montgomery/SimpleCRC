@@ -79,12 +79,19 @@ uint16_t compute_crc(const char* buf, size_t len, struct crc16 params) {
 	crc = params.init;
 	ptr = buf;
 
-	if ( ptr != NULL ) for (a=0; a<len; a++) {
+	if ( ptr != NULL ) {
+        for (a=0; a<len; a++) {
+            uint16_t u_char = (uint16_t) *ptr++;
+            if(params.ref_in)
+                u_char = reflect(u_char, 8);
+		    crc = (crc << 8) ^ table[ ((crc >> 8) ^ u_char) & 0x00FF ];
+	    }
+    }
 
-		crc = (crc << 8) ^ table[ ((crc >> 8) ^ (uint16_t) *ptr++) & 0x00FF ];
-	}
-
-	return crc;
+    if(params.ref_out)
+        return reflect(crc,16) ^ params.xor_out;
+    else
+	    return crc ^ params.xor_out;
 
 }
 
