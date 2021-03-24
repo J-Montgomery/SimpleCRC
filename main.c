@@ -24,8 +24,10 @@ struct crc16 {
                                    .xor_out = XOR_OUT, .residue = RESIDUE, .check = CHECK }
 
 DECLARE_CRC16(IBM_3740, 0x1021, 0xFFFF, false, false, 0x0, 0x0, 0x29b1);
-
 DECLARE_CRC16(KERMIT, 0x1021, 0x0000, true, true, 0x0, 0x0, 0x2189);
+DECLARE_CRC16(ISO_14443_3_A, 0x1021, 0xc6c6, true, true, 0x0, 0x0, 0xbf05);
+DECLARE_CRC16(MAXIM_DOW, 0x8005, 0x0000, true, true, 0xffff, 0x0, 0x44c2);
+DECLARE_CRC16(USB, 0x8005, 0xffff, true, true, 0xffff, 0x0, 0xb4c8);
 
 #define DECLARE_TEST(NAME, BUF, VAR) \
     VAR = compute_crc(BUF, 9, CRC16_##NAME); \
@@ -52,7 +54,7 @@ void precompute_table(struct crc16 params) {
 	uint16_t crc;
 	uint16_t c;
 
-	for (i=0; i<256; i++) {
+	for (i=0; i<255; i++) {
 
 		crc = 0;
 		c   = i << 8;
@@ -101,6 +103,10 @@ int main(int argc, char**argv) {
 
    DECLARE_TEST(IBM_3740, buf, result);
    DECLARE_TEST(KERMIT, buf, result);
+
+    DECLARE_TEST(ISO_14443_3_A, buf, result);
+    DECLARE_TEST(MAXIM_DOW, buf, result);
+    DECLARE_TEST(USB, buf, result);
 
     return 0;
 }
