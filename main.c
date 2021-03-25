@@ -2,17 +2,18 @@
 #include <stdint.h>
 #include <stdbool.h>
 
-uint16_t table[256] = {0};
+uint64_t table[256] = {0};
+uint64_t table2[256] = {0};
 
 struct crc16 {
-	uint16_t poly;
-	uint16_t init;
-	bool ref_in;
+	uint64_t poly;
+	uint64_t init;
+	uint64_t xor_out;
+	uint64_t residue;
+    uint64_t check;
+    uint64_t width;
+    bool ref_in;
 	bool ref_out;
-	uint16_t xor_out;
-	uint16_t residue;
-    uint16_t check;
-    uint16_t width;
 };
 
 #define xstr(a) str(a)
@@ -30,11 +31,13 @@ DECLARE_CRC(KERMIT, 0x1021, 0x0000, true, true, 0x0, 0x0, 0x2189, 16);
 DECLARE_CRC(ISO_14443_3_A, 0x1021, 0xc6c6, true, true, 0x0, 0x0, 0xbf05, 16);
 DECLARE_CRC(MAXIM_DOW, 0x8005, 0x0000, true, true, 0xffff, 0x0, 0x44c2, 16);
 DECLARE_CRC(USB, 0x8005, 0xffff, true, true, 0xffff, 0x0, 0xb4c8, 16);
+DECLARE_CRC(AUTOSAR_32, 0xf4acfb13, 0xffffffff, true, true, 0xffffffff, 0x0, 0x1697d06a, 32);
+DECLARE_CRC(GO_ISO, 0x000000000000001b, 0xffffffffffffffff, true, true, 0xffffffffffffffff, 0x0, 0xb90956c775a41001, 64);
 DECLARE_CRC(CDMA2000, 0x2f, 0x1f, false, false, 0xff, 0x0, 0xdf, 8);
 
 #define DECLARE_TEST(NAME, BUF, VAR) \
     VAR = compute_crc(BUF, 9, CRC_##NAME); \
-    printf("%s %s: 0x%.4x\n", xstr(CRC_##NAME),\
+    printf("%s %s: 0x%.8lx\n", xstr(CRC_##NAME),\
         (result == CRC_##NAME.check)?"PASSED":"FAILED", VAR)
 
 uint64_t reflect(uint64_t val, unsigned count)
@@ -53,10 +56,10 @@ uint64_t reflect(uint64_t val, unsigned count)
 
 void precompute_table(struct crc16 params)
 {
-    uint16_t mask = 1 << (params.width - 1);
+    uint64_t mask = (uint64_t)1 << (params.width - 1);
     for (int byte = 0; byte < 255; ++byte)
     {
-        uint16_t crc = byte;
+        uint64_t crc = byte;
 
         for (int bit = params.width; bit > 0; --bit)
         {
@@ -70,23 +73,45 @@ void precompute_table(struct crc16 params)
     }
 }
 
-uint16_t compute_crc(const char* buf, size_t len, struct crc16 params) {
-	uint16_t crc;
+void precompute_table2(struct crc16 params)
+{
+  for (int byte = 0; byte < 256; ++byte)
+  {
+    uint64_t crc = byte;
+
+    for (int bit = 32; bit > 0; --bit)
+    {
+      if (crc & 0x80000000)
+      {
+        crc = (crc << 1) ^ params.poly;
+      }
+      else
+      {
+        crc <<= 1;
+      }
+    }
+
+    table2[byte] = crc;
+  }
+}
+
+uint64_t compute_crc(const char* buf, size_t len, struct crc16 params) {
+	uint64_t crc;
 	const char *ptr;
 	size_t a;
 
     precompute_table(params);
 
-	crc = params.init;
+	crc = params.init; //reflect(params.init, 16);
 	ptr = buf;
 
-	if ( ptr != NULL ) {
-        for (a=0; a<len; a++) {
-            uint16_t u_char = (uint16_t) *ptr++;
-            if(params.ref_in)
-                u_char = reflect(u_char, 8);
-		    crc = (crc << 8) ^ table[ ((crc >> 8) ^ u_char) & 0x00FF ];
-	    }
+
+    for (a=0; a<len; a++) {
+        uint8_t u_char = (uint8_t) *ptr++;
+        if(params.ref_in)
+            u_char = reflect(u_char, 8);
+        //crc = (crc << 8) ^ table[ ((crc >> 24) ^ u_char) & 0x00FF ];
+        crc = table[((crc>>(params.width - 8)) ^ u_char) & 0xFFL] ^ (crc << 8);
     }
 
     if(params.ref_out)
@@ -94,11 +119,11 @@ uint16_t compute_crc(const char* buf, size_t len, struct crc16 params) {
     else
 	    crc = crc ^ params.xor_out;
 
-    return crc;
+    return crc & (((uint64_t)1 << params.width) - 1);
 }
 
 int main(int argc, char**argv) {
-    uint16_t result = 0;
+    uint64_t result = 0;
     char buf[] = "123456789";
 
    DECLARE_TEST(IBM_3740, buf, result);
@@ -108,9 +133,12 @@ int main(int argc, char**argv) {
     DECLARE_TEST(MAXIM_DOW, buf, result);
     DECLARE_TEST(USB, buf, result);
 
+    DECLARE_TEST(AUTOSAR_32, buf, result);
+    DECLARE_TEST(GO_ISO, buf, result);
+    //precompute_table2(CRC_AUTOSAR_32);
+    //printf("0x%.8lx 0x%.8lx 0x%.8lx 0x%.8lx\n", table[0], table[1], table[2], table[3]);
+    //printf("0x%.8lx 0x%.8lx 0x%.8lx 0x%.8lx\n", table2[0], table2[1], table2[2], table2[3]);
     DECLARE_TEST(CDMA2000, buf, result);
-
-    printf("0x%x 0x%x 0x%x 0x%x\n", table[0], table[1], table[2], table[3]);
 
     return 0;
 }
