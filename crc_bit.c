@@ -3,8 +3,6 @@
 #include <stdbool.h>
 
 uint64_t table[256] = {0};
-uint64_t table2[256] = {0};
-
 struct crc16 {
 	uint64_t poly;
 	uint64_t init;
@@ -18,8 +16,6 @@ struct crc16 {
 
 #define xstr(a) str(a)
 #define str(a) #a
-#define BITMASK(X) (1L << (X))
-#define CRC16_BITS (16)
 #define DECLARE_CRC(NAME, POLY, INIT, REF_IN, REF_OUT, XOR_OUT, RESIDUE, CHECK, WIDTH)   \
     struct crc16 CRC_##NAME = (struct crc16){.poly = POLY, .init = INIT, \
                                    .ref_in = REF_IN, .ref_out = REF_OUT,     \
@@ -39,11 +35,22 @@ DECLARE_CRC(CDMA2000, 0x9b, 0xff, false, false, 0x00, 0x0, 0xda, 8);
 DECLARE_CRC(DARC, 0x39, 0x00, true, true, 0x00, 0x0, 0x15, 8);
 DECLARE_CRC(CAN_FD, 0x1685b, 0x00, false, false, 0x00, 0x0, 0x04f03, 17);
 
+DECLARE_CRC(BZIP2, 0x04c11db7, 0xffffffff , false, false, 0xffffffff , 0x0, 0xfc891918 , 32);
+DECLARE_CRC(ROHC_3, 0x6, 0x7, false, false, 0x0, 0x0, 0x6, 3);
+DECLARE_CRC(ROHC_7, 0x79, 0x7f, false, false, 0x0, 0x0, 0x53, 7);
+DECLARE_CRC(GSM, 0x2f, 0x00, false, false, 0x3f, 0x0, 0x13, 6);
 
 #define DECLARE_TEST(NAME, BUF, VAR) \
     VAR = compute_crc(BUF, 9, CRC_##NAME); \
     printf("%s %s:\t\t0x%.8lx\n", (result == CRC_##NAME.check)?"PASSED":"FAILED", \
         xstr(CRC_##NAME), VAR)
+
+
+uint64_t gen_mask(uint64_t topbit) {
+    uint64_t mask = ((topbit - 1) << 1) | 0x01;
+    return mask;
+}
+
 
 uint64_t reflect(uint64_t val, unsigned count)
 {
@@ -59,35 +66,53 @@ uint64_t reflect(uint64_t val, unsigned count)
     return ret;
 }
 
-uint64_t gen_mask(uint64_t width) {
-    if(width >= 64)
-        return 0xffffffffffffffff;
-    else
-        return ((uint64_t)1 << width) - 1;
+
+void print_mem(uint64_t *buf, unsigned len) {
+    for (unsigned i=0; i<len; i++) {
+        printf("%02lx ", buf[i]);
+        if ((i+1)%16 == 0) printf("\n");
+    }
 }
 
 void precompute_table(struct crc16 params)
 {
-    uint64_t topbit = (uint64_t)1 << (params.width - 1);
+    const uint64_t topbit = (uint64_t)1 << (params.width - 1);
+    const uint64_t mask = gen_mask(topbit);
+    const unsigned bits = (params.width > 8)?params.width:8;
 
-    for (uint8_t byte = 0; byte < 255; ++byte)
-    {
-        uint64_t crc = byte;
-
-        for (int bit = params.width; bit > 0; --bit)
-        {
-            if (crc & topbit)
-                crc = (crc << 1) ^ params.poly;
-            else
-                crc <<= 1;
+    uint64_t crc = 0;
+    for (int i=0; i<256; i++) {
+        crc = i;
+        for (int j = bits; j > 0; --j) {
+            if(params.width < 8) {
+                if (crc & 1)
+                    crc = (crc >> 1) ^ params.poly;
+                else
+                    crc = (crc >> 1);
+            }
+            else {
+                if (crc & topbit)
+                    crc = (crc << 1) ^ params.poly;
+                else
+                    crc <<= 1;
+            }
         }
-
-        table[byte] = crc & gen_mask(params.width);
+        table[i] = crc & mask;
     }
+}
+
+unsigned char crc_calc_test(unsigned char *buf, int size, uint64_t *table, unsigned init, unsigned width) {
+  unsigned char crc = init;
+  unsigned mask = (unsigned)gen_mask((uint64_t)1 << (width - 1));
+  for (int i=0; i<size; i++) {
+    crc = table[buf[i] ^ (crc & mask)];
+  }
+  return crc;
 }
 
 uint64_t compute_crc(const char* buf, size_t len, struct crc16 params) {
 	uint64_t crc;
+    const uint64_t mask = gen_mask((uint64_t)1 << (params.width - 1));
 	const char *ptr;
 	size_t a;
 
@@ -102,6 +127,9 @@ uint64_t compute_crc(const char* buf, size_t len, struct crc16 params) {
             u_char = reflect(u_char, 8);
         if(params.width >= 8)
             crc = table[((crc>>(params.width - 8)) ^ (uint64_t)u_char) & 0xFFull] ^ (crc << 8);
+        else {
+            crc = table[u_char ^ (crc & mask)];
+        }
     }
 
     if(params.ref_out)
@@ -109,15 +137,15 @@ uint64_t compute_crc(const char* buf, size_t len, struct crc16 params) {
     else
 	    crc = crc ^ params.xor_out;
 
-    return crc & gen_mask(params.width);
+    return crc & mask;
 }
 
 int main(int argc, char**argv) {
     uint64_t result = 0;
     char buf[] = "123456789";
 
-   DECLARE_TEST(IBM_3740, buf, result);
-   DECLARE_TEST(KERMIT, buf, result);
+    DECLARE_TEST(IBM_3740, buf, result);
+    DECLARE_TEST(KERMIT, buf, result);
 
     DECLARE_TEST(ISO_14443, buf, result);
     DECLARE_TEST(MAXIM_DOW, buf, result);
@@ -131,6 +159,11 @@ int main(int argc, char**argv) {
     DECLARE_TEST(DARC, buf, result);
     DECLARE_TEST(CDMA2000, buf, result);
     DECLARE_TEST(CAN_FD, buf, result);
-
+    DECLARE_TEST(GO_ISO, buf, result);
+    DECLARE_TEST(CDMA2000, buf, result);
+    DECLARE_TEST(BZIP2, buf, result);
+    DECLARE_TEST(ROHC_3, buf, result);
+    DECLARE_TEST(ROHC_7, buf, result);
+    DECLARE_TEST(GSM, buf, result);
     return 0;
 }
