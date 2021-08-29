@@ -38,6 +38,7 @@ DECLARE_CRC(GSM_40, 0x0004820009, 0x0, false, false, 0xffffffffff, 0x0, 0xd4164f
 DECLARE_CRC(CDMA2000, 0x9b, 0xff, false, false, 0x00, 0x0, 0xda, 8);
 DECLARE_CRC(DARC, 0x39, 0x00, true, true, 0x00, 0x0, 0x15, 8);
 DECLARE_CRC(CAN_FD, 0x1685b, 0x00, false, false, 0x00, 0x0, 0x04f03, 17);
+DECLARE_CRC(24Q, 0x864cfb, 0x00, false, false, 0x000000, 0x000000, 0xcde703, 24);
 
 
 #define DECLARE_TEST(NAME, BUF, VAR) \
@@ -70,7 +71,7 @@ void precompute_table(struct crc16 params)
 {
     uint64_t topbit = (uint64_t)1 << (params.width - 1);
 
-    for (uint8_t byte = 0; byte < 255; ++byte)
+    for (int byte = 0; byte < 256; ++byte)
     {
         uint64_t crc = byte;
 
@@ -84,6 +85,7 @@ void precompute_table(struct crc16 params)
 
         table[byte] = crc & gen_mask(params.width);
     }
+
 }
 
 uint64_t compute_crc(const char* buf, size_t len, struct crc16 params) {
@@ -131,6 +133,15 @@ int main(int argc, char**argv) {
     DECLARE_TEST(DARC, buf, result);
     DECLARE_TEST(CDMA2000, buf, result);
     DECLARE_TEST(CAN_FD, buf, result);
+
+    DECLARE_TEST(24Q, buf, result);
+
+
+    /*for (int i = 0; i < 256; i++) {
+	printf("0x%08lx, ", table[i] & 0xFFFFFF);
+	if ((i % 4) == 3)
+	    putchar('\n');
+    }*/
 
     return 0;
 }
