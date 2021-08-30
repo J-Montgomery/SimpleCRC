@@ -1,9 +1,9 @@
-get_target_property(SOURCE_FILES simplecrc SOURCES)
+get_target_property(SOURCE_FILES ${LibName} SOURCES)
 
 find_program(CLANG_TIDY NAMES clang-tidy)
 if (CLANG_TIDY)
     add_custom_target(
-            clang-tidy
+            tidy
             WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
             COMMAND ${CLANG_TIDY}
             ${SOURCE_FILES}
@@ -16,7 +16,7 @@ endif ()
 find_program(CLANG_FORMAT NAMES clang-format)
 if (CLANG_FORMAT)
     add_custom_target(
-            clang-format
+            format
             WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
             COMMAND ${CLANG_FORMAT}
             -i ${SOURCE_FILES} ${TEST_SOURCE_FILES}

@@ -53,4 +53,5 @@ dkms.conf
 
 # Working directories
 bin/*
+build/*
 .vscode/*

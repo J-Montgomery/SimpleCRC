@@ -35,6 +35,6 @@ Basic library to reliably compute n-bit CRCs. The focus is on a readable, portab
 
 **Useful Rules**
 
-1. `make clang-format`
+1. `make format`
 
-2. `make clang-tidy`
+2. `make tidy`
