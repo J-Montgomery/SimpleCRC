@@ -36,7 +36,7 @@ DECLARE_CRC(GSM, 0x2f, 0x00, false, false, 0x3f, 0x0, 0x13, 6);
 
 #define DECLARE_BIT_TEST(NAME, BUF, VAR)                               \
 	VAR = compute_crc_bit(BUF, 9, CRC_##NAME);                 \
-	printf("%s %s:\t\t0x%.8lx\n",                              \
+	printf("%s %-16s 0x%.8lx\n",                              \
 	       (result == CRC_##NAME.check) ? "PASSED" : "FAILED", \
 	       xstr(CRC_##NAME), VAR);   \
     if(result != CRC_##NAME.check) return 1
