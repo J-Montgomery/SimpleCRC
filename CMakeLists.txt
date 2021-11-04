@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.12)
-project(simplecrc VERSION 1.0.0 LANGUAGES C
+project(simplecrc VERSION 1.1.0 LANGUAGES C
         DESCRIPTION "Simple CRC library")
 
 set(CMAKE_C_STANDARD 11)
