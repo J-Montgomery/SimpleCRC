@@ -2,15 +2,15 @@ Basic library to reliably compute n-bit CRCs. The focus is on a readable, portab
 
 **Status**
 ---
-| Feature | Status | Notes |
-| ------- | ------ | ----- |
-| 1 < n < 8 | - [x] | Separate impl, not include-able yet |
-| 9 < n < 16 | - [x] | Not include-able yet |
-| 17 < n < 32 | - [x] | Not include-able yet |
-| 33 < n < 64 | - [x] | Not include-able yet |
-| Formally Verified | - [ ] | |
-| Exhaustively Tested | - [ ] | |
-| Production-Ready | - [ ] | |
+| Feature             | Status             | Notes                   |
+|---------------------|--------------------|-------------------------|
+| 1 < n < 8           | :x:                | Not Currently Supported |
+| 9 < n < 16          | :heavy_check_mark: | Functional              |
+| 17 < n < 32         | :heavy_check_mark: | Functional              |
+| 33 < n < 64         | :heavy_check_mark: | Functional              |
+| Formally Verified   | :x:                |                         |
+| Exhaustively Tested | :x:                |                         |
+| Production-Ready    | :heavy_check_mark: |                         |
 
 **Build Dependencies**
 ---
