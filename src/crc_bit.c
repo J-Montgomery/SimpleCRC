@@ -1,38 +1,8 @@
 #include <stdio.h>
-#include <stdint.h>
-#include <stdbool.h>
+#include "simplecrc.h"
+#include "internal/utility.h"
 
 uint64_t table[256] = { 0 };
-struct crc16 {
-	uint64_t poly;
-	uint64_t init;
-	uint64_t xor_out;
-	uint64_t residue;
-	uint64_t check;
-	uint64_t width;
-	bool ref_in;
-	bool ref_out;
-};
-
-uint64_t gen_mask_bit(uint64_t topbit)
-{
-	uint64_t mask = ((topbit - 1) << 1) | 0x01;
-	return mask;
-}
-
-uint64_t reflect_bit(uint64_t val, unsigned count)
-{
-	uint64_t ret = val;
-	for (int i = 0; i < count; i++) {
-		uint64_t srcbit = ((uint64_t)1 << i);
-		uint64_t dstbit = ((uint64_t)1 << (count - i - 1));
-		if ((val & srcbit) != 0)
-			ret |= dstbit;
-		else
-			ret = ret & (~dstbit);
-	}
-	return ret;
-}
 
 void print_mem(uint64_t *buf, unsigned len)
 {
@@ -43,10 +13,10 @@ void print_mem(uint64_t *buf, unsigned len)
 	}
 }
 
-void precompute_table_bit(struct crc16 params)
+void precompute_table_bit(struct crc_def params)
 {
 	const uint64_t topbit = (uint64_t)1 << (params.width - 1);
-	const uint64_t mask = gen_mask_bit(topbit);
+	const uint64_t mask = gen_mask(params.width);
 	const unsigned bits = (params.width > 8) ? params.width : 8;
 
 	uint64_t crc = 0;
@@ -73,17 +43,17 @@ unsigned char crc_calc_test(unsigned char *buf, int size, uint64_t *table,
 							unsigned init, unsigned width)
 {
 	unsigned char crc = init;
-	unsigned mask = (unsigned)gen_mask_bit((uint64_t)1 << (width - 1));
+	unsigned mask = (unsigned)gen_mask(width);
 	for (int i = 0; i < size; i++) {
 		crc = table[buf[i] ^ (crc & mask)];
 	}
 	return crc;
 }
 
-uint64_t compute_crc_bit(const char *buf, size_t len, struct crc16 params)
+uint64_t compute_crc_bit(const char *buf, size_t len, struct crc_def params)
 {
 	uint64_t crc;
-	const uint64_t mask = gen_mask_bit((uint64_t)1 << (params.width - 1));
+	const uint64_t mask = gen_mask(params.width);
 	const char *ptr;
 	size_t a;
 
@@ -95,7 +65,7 @@ uint64_t compute_crc_bit(const char *buf, size_t len, struct crc16 params)
 	for (a = 0; a < len; a++) {
 		uint8_t u_char = (uint8_t)*ptr++;
 		if (params.ref_in)
-			u_char = reflect_bit(u_char, 8);
+			u_char = reflect(u_char, 8);
 		if (params.width >= 8)
 			crc = table[((crc >> (params.width - 8)) ^ (uint64_t)u_char) &
 						0xFFull] ^
@@ -106,7 +76,7 @@ uint64_t compute_crc_bit(const char *buf, size_t len, struct crc16 params)
 	}
 
 	if (params.ref_out)
-		crc = reflect_bit(crc, params.width) ^ params.xor_out;
+		crc = reflect(crc, params.width) ^ params.xor_out;
 	else
 		crc = crc ^ params.xor_out;
 

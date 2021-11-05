@@ -7,7 +7,7 @@
 #define CRC16_BITS (16)
 #define DECLARE_CRC(NAME, POLY, INIT, REF_IN, REF_OUT, XOR_OUT, RESIDUE,    \
 		    CHECK, WIDTH)                                           \
-	struct crc16 CRC_##NAME = (struct crc16)                            \
+	struct crc_def CRC_##NAME = (struct crc_def)                        \
 	{                                                                   \
 		.poly = POLY, .init = INIT, .ref_in = REF_IN,               \
 		.ref_out = REF_OUT, .xor_out = XOR_OUT, .residue = RESIDUE, \
