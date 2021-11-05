@@ -18,12 +18,13 @@ struct crc_def {
 
 uint64_t crc_one_byte(int init, int width, uint64_t poly);
 void precompute_table_bit(struct crc_def params);
-uint64_t compute_crc(const unsigned char *buf, size_t len, struct crc_def params);
+uint64_t compute_crc(const unsigned char *buf, size_t len,
+					 struct crc_def params);
 
 void print_mem(uint64_t *buf, unsigned len);
 void precompute_table_bit(struct crc_def params);
 unsigned char crc_calc_test(unsigned char *buf, int size, uint64_t *table,
-			    unsigned init, unsigned width);
+							unsigned init, unsigned width);
 uint64_t compute_crc_bit(const char *buf, size_t len, struct crc_def params);
 
 #endif /* SIMPLECRC_H_ */

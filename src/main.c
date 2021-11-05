@@ -44,7 +44,7 @@ uint64_t compute_crc(const unsigned char *buf, size_t len,
 			u_char = reflect(u_char, 8);
 		if (params.width >= 8)
 			crc = big_table[((crc >> (params.width - 8)) ^ (uint64_t)u_char) &
-						0xFFull] ^
+							0xFFull] ^
 				  (crc << 8);
 	}
 
