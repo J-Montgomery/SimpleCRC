@@ -1,4 +1,5 @@
 #include "simplecrc.h"
+#include "internal/crc_utility.h"
 
 uint64_t reflect(uint64_t val, unsigned count)
 {

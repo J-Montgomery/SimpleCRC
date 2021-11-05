@@ -1,6 +1,6 @@
 #include <stdio.h>
 #include "simplecrc.h"
-#include "internal/utility.h"
+#include "internal/crc_utility.h"
 
 uint64_t table[256] = { 0 };
 

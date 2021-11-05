@@ -1,16 +1,9 @@
 #include <stdio.h>
 #include <simplecrc.h>
+#include <internal/crc_utility.h>
 
 #define xstr(a) str(a)
 #define str(a) #a
-#define DECLARE_CRC(NAME, POLY, INIT, REF_IN, REF_OUT, XOR_OUT, RESIDUE,    \
-		    CHECK, WIDTH)                                           \
-	struct crc_def CRC_##NAME = (struct crc_def)                        \
-	{                                                                   \
-		.poly = POLY, .init = INIT, .ref_in = REF_IN,               \
-		.ref_out = REF_OUT, .xor_out = XOR_OUT, .residue = RESIDUE, \
-		.check = CHECK, .width = WIDTH                              \
-	}
 
 DECLARE_CRC(IBM_3740, 0x1021, 0xFFFF, false, false, 0x0, 0x0, 0x29b1, 16);
 DECLARE_CRC(KERMIT, 0x1021, 0x0000, true, true, 0x0, 0x0, 0x2189, 16);
@@ -34,9 +27,9 @@ DECLARE_CRC(ROHC_3, 0x6, 0x7, false, false, 0x0, 0x0, 0x6, 3);
 DECLARE_CRC(ROHC_7, 0x79, 0x7f, false, false, 0x0, 0x0, 0x53, 7);
 DECLARE_CRC(GSM, 0x2f, 0x00, false, false, 0x3f, 0x0, 0x13, 6);
 
-#define DECLARE_BIT_TEST(NAME, BUF, VAR)                               \
+#define DECLARE_BIT_TEST(NAME, BUF, VAR)                           \
 	VAR = compute_crc_bit(BUF, 9, CRC_##NAME);                 \
-	printf("%s %-16s 0x%.8lx\n",                              \
+	printf("%s %-16s 0x%.8lx\n",                               \
 	       (result == CRC_##NAME.check) ? "PASSED" : "FAILED", \
 	       xstr(CRC_##NAME), VAR);   \
     if(result != CRC_##NAME.check) return 1

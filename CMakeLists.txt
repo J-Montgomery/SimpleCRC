@@ -13,7 +13,7 @@ endif()
 set(LibName simplecrc)
 set(IncludeDir ${CMAKE_SOURCE_DIR}/include)
 
-add_library(${LibName} src/main.c src/crc_bit.c src/utility.c)
+add_library(${LibName} src/main.c src/crc_bit.c src/crc_utility.c)
 target_include_directories(${LibName} PUBLIC ${IncludeDir})
 
 

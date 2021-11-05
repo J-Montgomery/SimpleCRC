@@ -1,5 +1,5 @@
 #include "simplecrc.h"
-#include "internal/utility.h"
+#include "internal/crc_utility.h"
 
 uint64_t table[256] = { 0 };
 
@@ -26,7 +26,8 @@ void precompute_table_bit(struct crc_def params)
 	}
 }
 
-uint64_t compute_crc(const unsigned char *buf, size_t len, struct crc_def params)
+uint64_t compute_crc(const unsigned char *buf, size_t len,
+					 struct crc_def params)
 {
 	uint64_t crc;
 	const unsigned char *ptr;
