@@ -35,6 +35,6 @@ Basic library to reliably compute n-bit CRCs. The focus is on a readable, portab
 
 **Useful Rules**
 
-1. `make format`
+1. `make format` to format code changes
 
-2. `make tidy`
+2. `make check` to run tests

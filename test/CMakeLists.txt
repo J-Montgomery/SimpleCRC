@@ -50,6 +50,7 @@ add_test(crc_bit_test test_bit_executable)
 
 add_executable(test_db_executable src/db_test.c)
 target_link_libraries(test_db_executable ${LibName})
-add_test(crc_db_test test_db_executable)
+add_test(NAME crc_db_test COMMAND
+         test_db_executable ${CRC_DB_FILE})
 
 set_tests_properties(crc_large_test crc_bit_test crc_db_test PROPERTIES DEPENDS ${CRC_DB_FILE})

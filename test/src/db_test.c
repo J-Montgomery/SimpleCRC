@@ -59,7 +59,7 @@ struct test_definition get_crc_def(char *line, int *errors)
 			if (width >= 8 && width <= 64 && !errno) {
 				def.params.width = width;
 			} else {
-				fprintf(stderr, "Invalid CRC width\n");
+				fprintf(stderr, "Unsupported CRC width\n");
 				*errors = EINVAL;
 				return def;
 			}
