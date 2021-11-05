@@ -38,4 +38,8 @@ add_executable(test_bit_executable src/bit_test.c)
 target_link_libraries(test_bit_executable ${LibName})
 add_test(crc_bit_test test_bit_executable)
 
-set_tests_properties(crc_large_test crc_bit_test PROPERTIES DEPENDS ${CRC_DB_FILE})
+add_executable(test_db_executable src/db_test.c)
+target_link_libraries(test_db_executable ${LibName})
+add_test(crc_db_test test_db_executable)
+
+set_tests_properties(crc_large_test crc_bit_test crc_db_test PROPERTIES DEPENDS ${CRC_DB_FILE})
