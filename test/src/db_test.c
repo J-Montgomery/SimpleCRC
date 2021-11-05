@@ -1,7 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <getopt.h>
-#include <errno.h>
+#include <sys/stat.h>
 #include <string.h>
 
 #include <simplecrc.h>
@@ -22,30 +21,53 @@ int main(int argc, char **argv)
 {
 	uint64_t result = 0;
 	unsigned char buf[] = "123456789";
-    char *test_name;
+    char *db_filename = NULL;
+    struct stat file_buf;
     struct crc_def params = {0};
-    int c;
+    FILE* fp;
+    size_t line_counter = 0;
+    char line[1024];
 
-    while(1) {
-        static struct option long_options[] = {
-            {"name", required_argument, 0, 'n'},
-            {"poly", required_argument, 0, 'p'},
-            {"refin", required_argument, 0, 'i'},
-            {"refout", required_argument, 0, 'o'},
-            {"xor", required_argument, 0, 'x'},
-            {"residue", required_argument, 0, 'r'},
-            {"check", required_argument, 0, 'c'},
-            {"width", required_argument, 0, 'w'},
-            {0, 0, 0, 0}
-        };
+    if(argc <= 1) {
+        printf("test <filename>\n");
+        return 1;
+    }
+    db_filename = argv[1];
+    if(db_filename == NULL) {
+        fprintf(stderr, "Filename not found\n");
+        return 1;
+    }
+    
+    if(stat(db_filename, &file_buf) != 0) {
+        fprintf(stderr, "File %s not found\n", db_filename);
+        return 1;
+    }
+    fp = fopen(db_filename, "r");
+    if(!fp) {
+        fprintf(stderr, "Could not open %s\n", db_filename);
+        return 1;
+    }
 
-        int opt_index = 0;
-        c = getopt_long(argc, argv, "n:p:i:o:x:r:c:w:", long_options, 
-        &opt_index);
+    while (fgets(line, sizeof(line), fp)) {
+        //printf("%s", line); 
+        char *token;
+        char *strptr = line;
+        char *eol = strchr(line, ';');
+        if(eol == NULL) {
+            fprintf(stderr, "Could not find terminator on line %zu\n%zu: %s\n", line_counter, line_counter, line);
+            return 1;
+        }
+        *eol = '\0';
+        while( (token = strsep(&strptr, " ")) != NULL ) {
+            printf("%s\n",token);
+        }
+        line_counter += 1;
+        printf("\n");
+    }
+    fclose(fp);
 
-        if(c == -1)
-            break;
-        switch(c) {
+    
+        /*
             case 'n': {
                 test_name = optarg;
                 break;
@@ -101,17 +123,11 @@ int main(int argc, char **argv)
                 if(width > 0 && width <= 64 && !errno) {
                     params.width = width;
                 }
-                break;
-            }
-            default:
-                abort();
-        }
-    }
-
+                break;*/
     printf("name: %s\npoly: 0x%.8lx\n"
            "xor_out: 0x%.8lx\nresidue: 0x%.8lx\n"
            "check: 0x%.8lx\nwidth: 0x%lu\n"
            "ref_in: %i\nref_out: %i\n",
-           test_name, params.poly, params.xor_out, params.residue, params.check, params.width, params.ref_in, params.ref_out);
+           "test", params.poly, params.xor_out, params.residue, params.check, params.width, params.ref_in, params.ref_out);
 	return 0;
 }

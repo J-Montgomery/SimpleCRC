@@ -27,10 +27,4 @@ endif()
 if(ENABLE_TESTS)
 add_subdirectory(${CMAKE_SOURCE_DIR}/test)
 
-check_include_files("getopt.h" HAVE_GETOPT_H)
-
-if(NOT HAVE_GETOPT_H)
-    message(FATAL_ERROR "dependency getopt not found")
-endif()
-
 endif() # ENABLE_TESTS
