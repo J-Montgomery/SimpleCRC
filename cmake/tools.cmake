@@ -1,4 +1,8 @@
-get_target_property(SOURCE_FILES ${LibName} SOURCES)
+file(GLOB_RECURSE SOURCE_FILES ${PROJECT_SOURCE_DIR}
+        "*.h"
+        "*.hpp"
+        "*.c"
+        "*.cpp")
 
 find_program(CLANG_TIDY NAMES clang-tidy)
 if (CLANG_TIDY)

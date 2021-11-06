@@ -42,7 +42,6 @@ performance as a secondary goal.
 - Formal verification of 1-bit CRC implementation
 - C++ library compatibility
 - Improve db_tests configurability with gtest
-- Fix formatting rules bugs
 - Add convenience header with "common" CRCs
 - Benchmark performance vs other libraries
 - Single bit error correction
@@ -146,7 +145,7 @@ algorithm defined by `params`.
 
 int foo(void) {
     uint64_t result = 0;
-	unsigned char buf[] = "123456789";
+    unsigned char buf[] = "123456789";
     DECLARE_CRC(KERMIT, 0x1021, 0x0000, true, true, 0x0, 0x0, 0x2189, 16);
     result = compute_crc(buf, 9, CRC_KERMIT);
     printf("%s\n", (result == CRC_KERMIT.check) ? "PASS" : "FAIL");
