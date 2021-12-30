@@ -37,7 +37,6 @@ void print_mem(uint64_t *buf, unsigned len);
 void precompute_table_bit(struct crc_def params);
 unsigned char crc_calc_test(unsigned char *buf, int size, uint64_t *table,
 							unsigned init, unsigned width);
-uint64_t compute_crc_bit(const char *buf, size_t len, struct crc_def params);
 
 #ifdef __cplusplus
 }
