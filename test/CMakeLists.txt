@@ -28,6 +28,7 @@ add_custom_target(regen-test-db
         BYPRODUCTS ${CRC_DB_FILE}
     )
 add_custom_target(check COMMAND ${CMAKE_CTEST_COMMAND} --verbose)
+add_dependencies(check regen-test-db)
 
 check_include_files("getopt.h" HAVE_GETOPT_H)
 if(NOT HAVE_GETOPT_H)
