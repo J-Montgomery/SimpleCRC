@@ -3,6 +3,7 @@
 #include "internal/crc_utility.h"
 
 uint64_t table[256] = { 0 };
+#define ONES(n) (((uint8_t)0 - 1) >> (8 - (n)))
 
 void print_mem(uint64_t *buf, unsigned len)
 {
@@ -17,23 +18,16 @@ void precompute_table_bit(struct crc_def params)
 {
 	const uint64_t topbit = (uint64_t)1 << (params.width - 1);
 	const uint64_t mask = gen_mask(params.width);
-	const unsigned bits = (params.width > 8) ? params.width : 8;
+	const unsigned bits = 8;
 
 	uint64_t crc = 0;
 	for (int i = 0; i < 256; i++) {
 		crc = i;
 		for (int j = bits; j > 0; --j) {
-			if (params.width < 8) {
 				if (crc & 1)
 					crc = (crc >> 1) ^ params.poly;
 				else
 					crc = (crc >> 1);
-			} else {
-				if (crc & topbit)
-					crc = (crc << 1) ^ params.poly;
-				else
-					crc <<= 1;
-			}
 		}
 		table[i] = crc & mask;
 	}
@@ -58,6 +52,7 @@ uint64_t compute_crc_bit(const char *buf, size_t len, struct crc_def params)
 	size_t a;
 
 	precompute_table_bit(params);
+	print_mem(table, 256);
 
 	crc = params.init;
 	ptr = buf;
@@ -66,13 +61,7 @@ uint64_t compute_crc_bit(const char *buf, size_t len, struct crc_def params)
 		uint8_t u_char = (uint8_t)*ptr++;
 		if (params.ref_in)
 			u_char = reflect(u_char, 8);
-		if (params.width >= 8)
-			crc = table[((crc >> (params.width - 8)) ^ (uint64_t)u_char) &
-						0xFFull] ^
-				  (crc << 8);
-		else {
-			crc = table[u_char ^ (crc & mask)];
-		}
+		crc = table[u_char ^ (crc & mask)];
 	}
 
 	if (params.ref_out)
