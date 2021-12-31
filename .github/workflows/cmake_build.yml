@@ -35,6 +35,4 @@ jobs:
           with:
             configurePreset: 'ninja-multi-vcpkg'
             buildPreset: 'ninja-multi-vcpkg-debug'
-
-        - name: run tests
-          run: ninja check
+            testPreset: 'ninja-multi-vcpkg-debug'

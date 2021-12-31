@@ -26,6 +26,7 @@ option(ENABLE_TESTS "Enable Tests" OFF)
 endif()
 
 if(ENABLE_TESTS)
+enable_testing()
 add_subdirectory(${CMAKE_SOURCE_DIR}/test)
 
 endif() # ENABLE_TESTS
