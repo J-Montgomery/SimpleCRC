@@ -19,6 +19,8 @@ jobs:
           with:
             submodules: true
 
+        - uses: py-actions/py-dependency-install@v3
+
         - uses: lukka/get-cmake@latest
 
         - name: Restore artifacts, or setup vcpkg for building artifacts
