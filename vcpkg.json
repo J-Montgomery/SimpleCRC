@@ -1,0 +1,7 @@
+{
+    "name": "simplecrc",
+    "version-string": "latest",
+    "dependencies": [
+      "getopt"
+    ]
+  }
