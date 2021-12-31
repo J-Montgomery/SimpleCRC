@@ -28,6 +28,10 @@ add_custom_target(regen-test-db
         BYPRODUCTS ${CRC_DB_FILE}
     )
 add_custom_target(check COMMAND ${CMAKE_CTEST_COMMAND} --verbose)
+
+# Due to CMake issues, this ends up regenerating the catalog every time
+# tests are run. Not sure how to work around this as the byproducts are
+# correctly specified
 add_dependencies(check regen-test-db)
 
 check_include_files("getopt.h" HAVE_GETOPT_H)
