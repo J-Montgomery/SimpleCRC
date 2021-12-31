@@ -5,7 +5,11 @@
 
 SimpleCRC is a basic library to reliably compute n-bit CRCs. The focus is on
 having a readable, general, and portable reference library with reasonable
-performance as a secondary goal.
+performance as a secondary goal. This library is distinguished from similar
+projects like [crcany](https://github.com/madler/crcany) because the focus is on
+providing a universal library that can be configured at runtime, rather than
+generating specialized code for each individual CRC or providing a command line
+application to do so.
 
 - [Introduction](#introduction)
   - [Feature Status](#feature-status)
@@ -35,18 +39,16 @@ performance as a secondary goal.
 | Production-Ready    | :heavy_check_mark: |                         |
 
 ## Feature Roadmap
-
-- Support for 1-8 bit CRCs
-- Support for 64+ bit CRCs
 - Formal verification of full byte CRC implementation
 - Formal verification of 1-bit CRC implementation
-- C++ library compatibility
+- ~~C++ library compatibility~~
 - Improve db_tests configurability with gtest
 - Add convenience header with "common" CRCs
 - Benchmark performance vs other libraries
 - Single bit error correction
 - Multi bit error correction
-- Automated releases CI setup
+- ~~Automated releases CI setup~~
+- Support for 64+ bit CRCs
 - Add variable size typedefs to reduce unnecessary memory usage
 - Allow table precomputation with "advanced" APIs
 

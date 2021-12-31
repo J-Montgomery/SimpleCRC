@@ -1,6 +1,11 @@
 name: Build Matrix
 
-on: [push]
+on:
+  push:
+    tags-ignore:
+      - '*'
+    branches:
+      - '*'
 
 jobs:
   job:
