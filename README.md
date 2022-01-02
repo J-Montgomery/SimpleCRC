@@ -14,6 +14,7 @@ application to do so.
 - [Introduction](#introduction)
   - [Feature Status](#feature-status)
   - [Feature Roadmap](#feature-roadmap)
+  - [Resolved](#resolved)
 - [Dependencies](#dependencies)
   - [Build Dependencies](#build-dependencies)
   - [Dev Dependencies](#dev-dependencies)
@@ -23,6 +24,7 @@ application to do so.
     - [Structs](#structs)
     - [Functions](#functions)
     - [Example Usage](#example-usage)
+    - [Minimizing Runtime Footprint](#minimizing-runtime-footprint)
 - [Useful Development Rules](#useful-development-rules)
 - [Implementation Details](#implementation-details)
 
@@ -39,18 +41,20 @@ application to do so.
 | Production-Ready    | :heavy_check_mark: |                         |
 
 ## Feature Roadmap
-- Formal verification of full byte CRC implementation
-- Formal verification of 1-bit CRC implementation
-- ~~C++ library compatibility~~
-- Improve db_tests configurability with gtest
-- Add convenience header with "common" CRCs
 - Benchmark performance vs other libraries
-- Single bit error correction
-- Multi bit error correction
-- ~~Automated releases CI setup~~
-- Support for 64+ bit CRCs
 - Add variable size typedefs to reduce unnecessary memory usage
 - Allow table precomputation with "advanced" APIs
+- Single bit error correction
+- Multi bit error correction
+- Formal verification of 1-bit CRC implementation
+- Formal verification of full byte CRC implementation
+- Support for 64+ bit CRCs
+- Improve db_tests configurability with gtest
+
+## Resolved
+- ~~Automated releases CI setup~~
+- ~~C++ library compatibility~~
+- ~~Add convenience header with "common" CRCs~~
 
 # Dependencies
 
@@ -115,6 +119,8 @@ Parameters:
    - The width of the feedback polynomial in bits.
    - Constrained to 64 >= `WIDTH` >= 8 in the current implementation.
 
+Many common CRCs are predefined and can be found in `<simplecrc/reference.h>`.
+
 ### Structs
 ```c_cpp
 struct crc_def {
@@ -139,7 +145,6 @@ uint64_t compute_crc(const unsigned char *buf, size_t len, struct crc_def params
 Calculate the CRC of a byte buffer `buf` of size `len`, according to the
 algorithm defined by `params`.
 
-
 ### Example Usage
 ```c_cpp
 #include <stdio.h>
@@ -153,11 +158,37 @@ int foo(void) {
     printf("%s\n", (result == CRC_KERMIT.check) ? "PASS" : "FAIL");
 }
 ```
+
+```c_cpp
+#include <stdio.h>
+#include <simplecrc.h>
+#include <simplecrc/reference.h>
+
+int foo(void) {
+    uint64_t crc = 0;
+    unsigned char buf[] = "123456789";
+    result = compute_crc(buf, 9, GSM_40);
+    printf("%s\n", (result == CRC_GSM_40.check) ? "PASS" : "FAIL");
+}
+```
+
+### Minimizing Runtime Footprint
+
+If using `reference.h`, the following macros may be disabled to reduce static
+memory usage. These macros are enabled by default and defining them will remove
+the corresponding CRC definitions.
+
+- INCLUDE_CRCS_8_15
+- INCLUDE_CRCS_16_31
+- INCLUDE_CRCS_16_31
+- INCLUDE_CRCS_32_63
+- INCLUDE_CRCS_MISC
+
 # Useful Development Rules
 
 1. `make format` to format code changes
 
-2. `make check` to run tests
+2. `make check` or `ctest` to run tests
 
 # Implementation Details
 
