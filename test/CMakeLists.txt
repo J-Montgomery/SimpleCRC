@@ -44,6 +44,14 @@ if(NOT HAVE_STRSEP)
     message(FATAL_ERROR "strsep not found")
 endif()
 
+if(ENABLE_FUZZING)
+    set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} -g -O1 -fsanitize=fuzzer,address")
+    add_executable(fuzz_test src/fuzzer_test.c)
+    target_link_libraries(fuzz_test ${LibName})
+
+    return() # Stop processing further tests
+endif()
+
 add_executable(test_executable src/test.c)
 target_link_libraries(test_executable ${LibName})
 add_test(crc_large_test test_executable)
@@ -74,7 +82,3 @@ DefineExhaustiveTest(gsm_40_test src/exhaustive_gsm40.c)
 
 # MISC exhaustive tests
 DefineExhaustiveTest(go_iso_test src/exhaustive_go_iso.c)
-
-#add_executable(kermit_test src/exhaustive_kermit.c)
-#target_link_libraries(kermit_test ${LibName})
-#add_test(kermit_test kermit_test)

@@ -26,6 +26,7 @@ application to do so.
     - [Example Usage](#example-usage)
     - [Minimizing Runtime Footprint](#minimizing-runtime-footprint)
 - [Useful Development Rules](#useful-development-rules)
+  - [Fuzzer Testing](#fuzzer-testing)
 - [Implementation Details](#implementation-details)
 
 
@@ -55,6 +56,7 @@ application to do so.
 - ~~Automated releases CI setup~~
 - ~~C++ library compatibility~~
 - ~~Add convenience header with "common" CRCs~~
+- ~~Implement basic fuzzer testing~~
 
 # Dependencies
 
@@ -189,6 +191,12 @@ the corresponding CRC definitions.
 1. `make format` to format code changes
 
 2. `make check` or `ctest` to run tests
+
+## Fuzzer Testing
+
+SimpleCRC supports fuzzing with libFuzzer by setting the ENABLE_FUZZING flag
+for CMake. Extended testing has thus far failed to discover any issues, but
+feel free to explore for yourself.
 
 # Implementation Details
 
