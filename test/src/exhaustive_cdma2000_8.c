@@ -38,7 +38,7 @@ int main(int argc, char **argv)
 	fill_test_array(&buffer, buf_size);
 
 	expected = CRCANY_INVOKE_ALGO(crc8cdma2000_bit, 8, buffer, buf_size);
-	computed = compute_crc(buffer, buf_size, CRC_CDMA2000_8);
+	computed = compute_crc(CRC_CDMA2000_8, buffer, buf_size);
 
 	if (expected == computed) {
 		printf("Test succeeded\n");

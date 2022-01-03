@@ -7,6 +7,6 @@
 
 int LLVMFuzzerTestOneInput(const uint8_t *data, size_t data_size)
 {
-	uint64_t computed = compute_crc(data, data_size, CRC_KERMIT);
+	uint64_t computed = compute_crc(CRC_KERMIT, data, data_size);
 	return 0;
 }

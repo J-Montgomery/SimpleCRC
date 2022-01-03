@@ -1,9 +1,12 @@
 #include "simplecrc.h"
 #include "internal/crc_utility.h"
+#include <stdio.h>
 
-uint64_t big_table[256] = { 0 };
+#define TABLE_LEN (256)
 
-uint64_t crc_one_byte(int init, int width, uint64_t poly)
+static uint64_t internal_table[TABLE_LEN] = { 0 };
+
+static uint64_t crc_one_byte(int init, int width, uint64_t poly)
 {
 	uint64_t topbit = (uint64_t)1 << (width - 1);
 	uint64_t crc = init;
@@ -18,22 +21,31 @@ uint64_t crc_one_byte(int init, int width, uint64_t poly)
 	return crc & gen_mask(width);
 }
 
-void precompute_table_bitshift(struct crc_def params)
+static void precompute_table_bitshift(struct crc_def params, uint64_t **buf)
 {
-	for (int byte = 0; byte < 256; ++byte) {
+	uint64_t *tbl = *buf;
+
+	for (int byte = 0; byte < TABLE_LEN; ++byte) {
 		uint64_t crc = crc_one_byte(byte, params.width, params.poly);
-		big_table[byte] = crc;
+		tbl[byte] = crc;
 	}
 }
 
-uint64_t compute_crc(const unsigned char *buf, size_t len,
-					 struct crc_def params)
+bool precompute_crc_table(struct crc_def params, uint64_t **table, size_t len)
+{
+	if (len != (TABLE_LEN * sizeof(uint64_t)) || !table || !(*table))
+		return false;
+
+	precompute_table_bitshift(params, table);
+	return true;
+}
+
+uint64_t compute_crc_fast(struct crc_def params, const unsigned char *buf,
+						  size_t len, const uint64_t *table)
 {
 	uint64_t crc;
 	const unsigned char *ptr;
 	size_t a;
-
-	precompute_table_bitshift(params);
 
 	crc = params.init;
 	ptr = buf;
@@ -43,8 +55,8 @@ uint64_t compute_crc(const unsigned char *buf, size_t len,
 		if (params.ref_in)
 			u_char = reflect(u_char, 8);
 		if (params.width >= 8)
-			crc = big_table[((crc >> (params.width - 8)) ^ (uint64_t)u_char) &
-							0xFFull] ^
+			crc = table[((crc >> (params.width - 8)) ^ (uint64_t)u_char) &
+						0xFFull] ^
 				  (crc << 8);
 	}
 
@@ -54,4 +66,13 @@ uint64_t compute_crc(const unsigned char *buf, size_t len,
 		crc = crc ^ params.xor_out;
 
 	return crc & gen_mask(params.width);
+}
+
+uint64_t compute_crc(struct crc_def params, const unsigned char *buf,
+					 size_t len)
+{
+	uint64_t *tbl_ptr = internal_table;
+
+	precompute_crc_table(params, &tbl_ptr, TABLE_LEN * sizeof(uint64_t));
+	return compute_crc_fast(params, buf, len, internal_table);
 }

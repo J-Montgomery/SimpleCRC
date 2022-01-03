@@ -40,7 +40,7 @@ int main(int argc, char **argv)
 	fill_test_array(&buffer, buf_size);
 
 	expected = CRCANY_INVOKE_ALGO(crc32autosar_bit, 32, buffer, buf_size);
-	computed = compute_crc(buffer, buf_size, CRC_AUTOSAR_32);
+	computed = compute_crc(CRC_AUTOSAR_32, buffer, buf_size);
 
 	if (expected == computed) {
 		printf("Test succeeded\n");

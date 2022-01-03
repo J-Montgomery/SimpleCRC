@@ -38,7 +38,7 @@ int main(int argc, char **argv)
 	fill_test_array(&buffer, buf_size);
 
 	expected = CRCANY_INVOKE_ALGO(crc16kermit_bit, 16, buffer, buf_size);
-	computed = compute_crc(buffer, buf_size, CRC_KERMIT);
+	computed = compute_crc(CRC_KERMIT, buffer, buf_size);
 
 	if (expected == computed) {
 		printf("Test succeeded\n");

@@ -26,7 +26,7 @@ int run_crc_check(struct test_definition def)
 	uint64_t result = 0;
 	unsigned char buf[] = "123456789";
 
-	result = compute_crc(buf, 9, def.params);
+	result = compute_crc(def.params, buf, 9);
 
 	printf("%s %s-%li %s 0x%.8lx\n",
 		   (result == def.params.check) ? "PASSED" : "FAILED", def.test_name,

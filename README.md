@@ -23,7 +23,7 @@ application to do so.
     - [Macros](#macros)
     - [Structs](#structs)
     - [Functions](#functions)
-    - [Example Usage](#example-usage)
+    - [Example Usages](#example-usages)
     - [Minimizing Runtime Footprint](#minimizing-runtime-footprint)
 - [Useful Development Rules](#useful-development-rules)
   - [Fuzzer Testing](#fuzzer-testing)
@@ -44,7 +44,6 @@ application to do so.
 ## Feature Roadmap
 - Benchmark performance vs other libraries
 - Add variable size typedefs to reduce unnecessary memory usage
-- Allow table precomputation with "advanced" APIs
 - Single bit error correction
 - Multi bit error correction
 - Formal verification of 1-bit CRC implementation
@@ -57,6 +56,7 @@ application to do so.
 - ~~C++ library compatibility~~
 - ~~Add convenience header with "common" CRCs~~
 - ~~Implement basic fuzzer testing~~
+- ~~Allow table precomputation with "advanced" APIs~~
 
 # Dependencies
 
@@ -145,9 +145,31 @@ set using the helper macro `DECLARE_CRC()`
 uint64_t compute_crc(const unsigned char *buf, size_t len, struct crc_def params);
 ```
 Calculate the CRC of a byte buffer `buf` of size `len`, according to the
-algorithm defined by `params`.
+algorithm defined by `params`. This function is not as performant as
+compute_crc_fast (which omits potentially repeated table initializations), but
+does not require managing memory manually.
 
-### Example Usage
+```c_cpp
+bool precompute_crc_table(struct crc_def params, uint64_t **table, size_t len);
+```
+Used in conjunction with compute_crc_fast(). Precomputes the CRC table using a
+buffer supplied by the caller. The buffer must be of size `256*sizeof(uint64_t)`.
+Returns `false` if called with a null pointer or if len is not correct. Returns
+`true` if initialization succeeds. Caller must allocate and free the memory
+associated with table.
+
+```c_cpp
+uint64_t compute_crc_fast(struct crc_def params, const unsigned char *buf, size_t len, const uint64_t *table);
+```
+Used in conjunction with precompute_crc_table(), which must be called first.
+Computes the CRC of the byte buffer `buf` of size `len`, according to the
+algorithm defined by `params. This function is functionally identical to
+compute_crc() except that it takes the table initialized by
+precompute_crc_table() as input and hence, avoids unnecessary table
+initializations when computing the same CRC repeatedly. Caller must allocate and
+free the memory associated with table.
+
+### Example Usages
 ```c_cpp
 #include <stdio.h>
 #include <simplecrc.h>

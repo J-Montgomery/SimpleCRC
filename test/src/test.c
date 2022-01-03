@@ -24,7 +24,7 @@ DECLARE_CRC(24Q, 0x864cfb, 0x00, false, false, 0x000000, 0x000000, 0xcde703,
 			24);
 
 #define DECLARE_TEST(NAME, BUF, VAR)                           \
-	VAR = compute_crc(BUF, 9, CRC_##NAME);                     \
+	VAR = compute_crc(CRC_##NAME, BUF, 9);                     \
 	printf("%s %-16s 0x%.8lx\n",                               \
 		   (result == CRC_##NAME.check) ? "PASSED" : "FAILED", \
 		   xstr(CRC_##NAME), VAR);                             \
