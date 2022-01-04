@@ -1,20 +1,30 @@
-cmake_minimum_required(VERSION 3.12)
-project(simplecrc VERSION 1.1.0 LANGUAGES C
+cmake_minimum_required(VERSION 3.10)
+project(simplecrc VERSION 2.0.0 LANGUAGES C
         DESCRIPTION "Simple CRC library")
 
 set(CMAKE_C_STANDARD 11)
 
 include(CheckIncludeFiles)
 include(CheckFunctionExists)
+include(GNUInstallDirs)
 
 if(NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE Debug)
 endif()
 
-set(LibName simplecrc)
-set(IncludeDir ${CMAKE_SOURCE_DIR}/include)
+set(SimpleCrcSources
+    ${PROJECT_SOURCE_DIR}/src/main.c
+    ${PROJECT_SOURCE_DIR}/src/crc_utility)
 
-add_library(${LibName} src/main.c src/crc_utility.c)
+set(SimpleCrcHeaders
+    ${PROJECT_SOURCE_DIR}/include/simplecrc.h
+    ${PROJECT_SOURCE_DIR}/include/internal/crc_utility.h
+    ${PROJECT_SOURCE_DIR}/include/simplecrc/reference.h)
+
+set(LibName simplecrc)
+set(IncludeDir ${PROJECT_SOURCE_DIR}/include)
+
+add_library(${LibName} ${SimpleCrcSources})
 target_include_directories(${LibName} PUBLIC ${IncludeDir})
 
 include(${CMAKE_SOURCE_DIR}/cmake/tools.cmake)
@@ -28,5 +38,7 @@ endif()
 if(ENABLE_TESTS)
 enable_testing()
 add_subdirectory(${CMAKE_SOURCE_DIR}/test)
-
 endif() # ENABLE_TESTS
+
+install(TARGETS simplecrc DESTINATION ${CMAKE_INSTALL_LIBDIR})
+install(FILES ${SimpleCRCHeaders} DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
