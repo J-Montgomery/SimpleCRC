@@ -44,6 +44,14 @@ if(NOT HAVE_STRSEP)
     message(FATAL_ERROR "strsep not found")
 endif()
 
+if(ENABLE_FUZZING)
+    set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} -g -O1 -fsanitize=fuzzer,address")
+    add_executable(fuzz_test src/fuzzer_test.c)
+    target_link_libraries(fuzz_test ${LibName})
+
+    return() # Stop processing further tests
+endif()
+
 add_executable(test_executable src/test.c)
 target_link_libraries(test_executable ${LibName})
 add_test(crc_large_test test_executable)
@@ -54,3 +62,23 @@ add_test(NAME crc_db_test COMMAND
          test_db_executable ${CRC_DB_FILE})
 
 set_tests_properties(crc_large_test crc_db_test PROPERTIES DEPENDS ${CRC_DB_FILE})
+
+function(DefineExhaustiveTest TestName TestFile)
+    add_executable(${TestName} ${TestFile})
+    target_link_libraries(${TestName} ${LibName})
+    add_test(${TestName} ${TestName})
+endfunction()
+
+# 8-15 bit tests
+DefineExhaustiveTest(cdma2000_8_test src/exhaustive_cdma2000_8.c)
+
+# 16-31 bit tests
+DefineExhaustiveTest(kermit_test src/exhaustive_kermit.c)
+DefineExhaustiveTest(ibm3740_test src/exhaustive_ibm3740.c)
+
+# 32-63 bit tests
+DefineExhaustiveTest(autosar32_test src/exhaustive_autosar32.c)
+DefineExhaustiveTest(gsm_40_test src/exhaustive_gsm40.c)
+
+# MISC exhaustive tests
+DefineExhaustiveTest(go_iso_test src/exhaustive_go_iso.c)

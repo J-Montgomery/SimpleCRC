@@ -14,6 +14,7 @@ application to do so.
 - [Introduction](#introduction)
   - [Feature Status](#feature-status)
   - [Feature Roadmap](#feature-roadmap)
+  - [Resolved](#resolved)
 - [Dependencies](#dependencies)
   - [Build Dependencies](#build-dependencies)
   - [Dev Dependencies](#dev-dependencies)
@@ -22,8 +23,10 @@ application to do so.
     - [Macros](#macros)
     - [Structs](#structs)
     - [Functions](#functions)
-    - [Example Usage](#example-usage)
+    - [Example Usages](#example-usages)
+    - [Minimizing Runtime Footprint](#minimizing-runtime-footprint)
 - [Useful Development Rules](#useful-development-rules)
+  - [Fuzzer Testing](#fuzzer-testing)
 - [Implementation Details](#implementation-details)
 
 
@@ -39,18 +42,21 @@ application to do so.
 | Production-Ready    | :heavy_check_mark: |                         |
 
 ## Feature Roadmap
-- Formal verification of full byte CRC implementation
-- Formal verification of 1-bit CRC implementation
-- ~~C++ library compatibility~~
-- Improve db_tests configurability with gtest
-- Add convenience header with "common" CRCs
 - Benchmark performance vs other libraries
+- Add variable size typedefs to reduce unnecessary memory usage
 - Single bit error correction
 - Multi bit error correction
-- ~~Automated releases CI setup~~
+- Formal verification of 1-bit CRC implementation
+- Formal verification of full byte CRC implementation
 - Support for 64+ bit CRCs
-- Add variable size typedefs to reduce unnecessary memory usage
-- Allow table precomputation with "advanced" APIs
+- Improve db_tests configurability with gtest
+
+## Resolved
+- ~~Automated releases CI setup~~
+- ~~C++ library compatibility~~
+- ~~Add convenience header with "common" CRCs~~
+- ~~Implement basic fuzzer testing~~
+- ~~Allow table precomputation with "advanced" APIs~~
 
 # Dependencies
 
@@ -115,6 +121,8 @@ Parameters:
    - The width of the feedback polynomial in bits.
    - Constrained to 64 >= `WIDTH` >= 8 in the current implementation.
 
+Many common CRCs are predefined and can be found in `<simplecrc/reference.h>`.
+
 ### Structs
 ```c_cpp
 struct crc_def {
@@ -137,10 +145,31 @@ set using the helper macro `DECLARE_CRC()`
 uint64_t compute_crc(const unsigned char *buf, size_t len, struct crc_def params);
 ```
 Calculate the CRC of a byte buffer `buf` of size `len`, according to the
-algorithm defined by `params`.
+algorithm defined by `params`. This function is not as performant as
+compute_crc_fast (which omits potentially repeated table initializations), but
+does not require managing memory manually.
 
+```c_cpp
+bool precompute_crc_table(struct crc_def params, uint64_t **table, size_t len);
+```
+Used in conjunction with compute_crc_fast(). Precomputes the CRC table using a
+buffer supplied by the caller. The buffer must be of size `256*sizeof(uint64_t)`.
+Returns `false` if called with a null pointer or if len is not correct. Returns
+`true` if initialization succeeds. Caller must allocate and free the memory
+associated with table.
 
-### Example Usage
+```c_cpp
+uint64_t compute_crc_fast(struct crc_def params, const unsigned char *buf, size_t len, const uint64_t *table);
+```
+Used in conjunction with precompute_crc_table(), which must be called first.
+Computes the CRC of the byte buffer `buf` of size `len`, according to the
+algorithm defined by `params. This function is functionally identical to
+compute_crc() except that it takes the table initialized by
+precompute_crc_table() as input and hence, avoids unnecessary table
+initializations when computing the same CRC repeatedly. Caller must allocate and
+free the memory associated with table.
+
+### Example Usages
 ```c_cpp
 #include <stdio.h>
 #include <simplecrc.h>
@@ -153,11 +182,43 @@ int foo(void) {
     printf("%s\n", (result == CRC_KERMIT.check) ? "PASS" : "FAIL");
 }
 ```
+
+```c_cpp
+#include <stdio.h>
+#include <simplecrc.h>
+#include <simplecrc/reference.h>
+
+int foo(void) {
+    uint64_t crc = 0;
+    unsigned char buf[] = "123456789";
+    result = compute_crc(buf, 9, GSM_40);
+    printf("%s\n", (result == CRC_GSM_40.check) ? "PASS" : "FAIL");
+}
+```
+
+### Minimizing Runtime Footprint
+
+If using `reference.h`, the following macros may be disabled to reduce static
+memory usage. These macros are enabled by default and defining them will remove
+the corresponding CRC definitions.
+
+- INCLUDE_CRCS_8_15
+- INCLUDE_CRCS_16_31
+- INCLUDE_CRCS_16_31
+- INCLUDE_CRCS_32_63
+- INCLUDE_CRCS_MISC
+
 # Useful Development Rules
 
 1. `make format` to format code changes
 
-2. `make check` to run tests
+2. `make check` or `ctest` to run tests
+
+## Fuzzer Testing
+
+SimpleCRC supports fuzzing with libFuzzer by setting the ENABLE_FUZZING flag
+for CMake. Extended testing has thus far failed to discover any issues, but
+feel free to explore for yourself.
 
 # Implementation Details
 
