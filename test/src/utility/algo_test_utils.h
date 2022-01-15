@@ -12,10 +12,10 @@
 		func(init, buf, buf_size);                                       \
 	})
 
-void fill_test_array(char **buf, size_t buf_size)
+void fill_test_array(unsigned char **buf, size_t buf_size)
 {
 	for (size_t i = 0; i < buf_size; i++) {
-		(*buf)[i] = (char)i % 256;
+		(*buf)[i] = (unsigned char)i % 256;
 	}
 }
 

@@ -32,7 +32,7 @@ int main(int argc, char **argv)
 	uintmax_t expected = 0;
 	uintmax_t computed = 0;
 
-	char *buffer = calloc(buf_size, 1);
+	unsigned char *buffer = calloc(buf_size, 1);
 	if (!buffer) {
 		return test_status;
 	}
