@@ -22,7 +22,6 @@ if (RV_MATCH)
     # Get the include dirs from each lib we have
     foreach(LIB ${TARGET_LIBS})
         get_target_property(LIB_INCLUDES ${LIB} INCLUDE_DIRECTORIES)
-        message(STATUS "incl: " ${LIB_INCLUDES})
         list(APPEND TARGET_INCLUDES ${LIB_INCLUDES})
     endforeach()
 
@@ -82,14 +81,14 @@ if(ENABLE_FUZZING)
     return() # Stop processing further tests
 endif()
 
-add_executable(test_executable src/test.c)
-target_link_libraries(test_executable ${LibName})
-add_test(crc_large_test test_executable)
+add_executable(crc_large_test src/test.c)
+target_link_libraries(crc_large_test ${LibName})
+add_test(crc_large_test crc_large_test)
 
-add_executable(test_db_executable src/db_test.c)
-target_link_libraries(test_db_executable ${LibName})
+add_executable(crc_db_test src/db_test.c)
+target_link_libraries(crc_db_test ${LibName})
 add_test(NAME crc_db_test COMMAND
-         test_db_executable ${CRC_DB_FILE})
+         crc_db_test ${CRC_DB_FILE})
 
 set_tests_properties(crc_large_test crc_db_test PROPERTIES DEPENDS ${CRC_DB_FILE})
 
@@ -102,23 +101,26 @@ endfunction()
 # 8-15 bit tests
 DefineExhaustiveTest(cdma2000_8_test src/exhaustive_cdma2000_8.c)
 
-AddRvMatchTest(cdma2000_8_test)
-
 # 16-31 bit tests
 DefineExhaustiveTest(kermit_test src/exhaustive_kermit.c)
 DefineExhaustiveTest(ibm3740_test src/exhaustive_ibm3740.c)
-
-AddRvMatchTest(kermit_test)
-AddRvMatchTest(ibm3740_test)
 
 # 32-63 bit tests
 DefineExhaustiveTest(autosar32_test src/exhaustive_autosar32.c)
 DefineExhaustiveTest(gsm_40_test src/exhaustive_gsm40.c)
 
-AddRvMatchTest(autosar32_test)
-AddRvMatchTest(gsm_40_test)
-
 # MISC exhaustive tests
 DefineExhaustiveTest(go_iso_test src/exhaustive_go_iso.c)
 
+
+# rv-match verification tests
+AddRvMatchTest(crc_large_test)
+AddRvMatchTest(crc_db_test)
+
+AddRvMatchTest(cdma2000_8_test)
+AddRvMatchTest(kermit_test)
+AddRvMatchTest(ibm3740_test)
+AddRvMatchTest(autosar32_test)
+
+AddRvMatchTest(gsm_40_test)
 AddRvMatchTest(go_iso_test)

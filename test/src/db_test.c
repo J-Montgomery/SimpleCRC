@@ -31,11 +31,11 @@ int run_crc_check(struct test_definition def)
 
 struct test_definition get_crc_def(char *line, int *errors)
 {
-	char *token;
 	char *strptr = line;
 	struct test_definition def = { 0 };
 	int iteration = 0;
-	while ((token = strsep(&strptr, " ")) != NULL) {
+	char *token = strtok(strptr, " ");
+	while (token != NULL) {
 		switch (iteration) {
 		case 0: // Algorithm name
 		{
@@ -142,7 +142,9 @@ struct test_definition get_crc_def(char *line, int *errors)
 			*errors = EINVAL;
 			return def;
 		}
+
 		iteration += 1;
+		token = strtok(NULL, " ");
 	}
 
 	return def;
