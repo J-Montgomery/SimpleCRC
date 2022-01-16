@@ -81,7 +81,7 @@ if(ENABLE_FUZZING)
     return() # Stop processing further tests
 endif()
 
-add_executable(crc_large_test src/test.c)
+add_executable(crc_large_test src/basic_test.c)
 target_link_libraries(crc_large_test ${LibName})
 add_test(crc_large_test crc_large_test)
 

@@ -28,20 +28,29 @@ if (CLANG_FORMAT)
 endif ()
 
 
-option(ADDRESS_SANITIZER "Enable AddressSanitizer" OFF)
-if (ADDRESS_SANITIZER)
+option(ASAN "Enable AddressSanitizer" OFF)
+if (ASAN)
     message(STATUS "AddressSanitizer enabled for debug build")
-    set(CMAKE_C_FLAGS_DEBUG 
+    set(CMAKE_C_FLAGS_DEBUG
         "${CMAKE_C_FLAGS_DEBUG} -fno-omit-frame-pointer -fsanitize=address")
-    set (CMAKE_LINKER_FLAGS_DEBUG 
+    set (CMAKE_LINKER_FLAGS_DEBUG
         "${CMAKE_LINKER_FLAGS_DEBUG} -fno-omit-frame-pointer -fsanitize=address")
 endif ()
 
-option(UNDEFINED_SANITIZER "Enable UndefinedBehaviorSanitizer" OFF)
-if (UNDEFINED_SANITIZER)
+option(UBSAN "Enable UndefinedBehaviorSanitizer" OFF)
+if (UBSAN)
     message(STATUS "UndefinedBehaviorSanitizer enabled for debug build")
     set(CMAKE_C_FLAGS_DEBUG
         "${CMAKE_C_FLAGS_DEBUG} -fsanitize=undefined")
-    set (CMAKE_LINKER_FLAGS_DEBUG 
+    set (CMAKE_LINKER_FLAGS_DEBUG
         "${CMAKE_LINKER_FLAGS_DEBUG} -fsanitize=undefined")
+endif ()
+
+option(MSAN "Enable MemorySanitizer" OFF)
+if (MSAN)
+    message(STATUS "MemorySanitizer enabled for debug build")
+    set(CMAKE_C_FLAGS_DEBUG
+        "${CMAKE_C_FLAGS_DEBUG} -fsanitize=memory")
+    set (CMAKE_LINKER_FLAGS_DEBUG
+        "${CMAKE_LINKER_FLAGS_DEBUG} -fsanitize=memory")
 endif ()

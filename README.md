@@ -26,21 +26,24 @@ application to do so.
     - [Example Usages](#example-usages)
     - [Minimizing Runtime Footprint](#minimizing-runtime-footprint)
 - [Useful Development Rules](#useful-development-rules)
+- [Verification](#verification)
+  - [Unit Testing](#unit-testing)
   - [Fuzzer Testing](#fuzzer-testing)
   - [Abstract Interpretation](#abstract-interpretation)
+  - [Formal Proofs](#formal-proofs)
 - [Implementation Details](#implementation-details)
 
 
 ## Feature Status
-| Feature             | Status             | Notes                   |
+| Feature             | Implemented        | Notes                   |
 |---------------------|--------------------|-------------------------|
 | 1 < n < 8           | :x:                | Not Currently Supported |
 | 9 < n < 16          | :heavy_check_mark: | Functional              |
 | 17 < n < 32         | :heavy_check_mark: | Functional              |
 | 33 < n < 64         | :heavy_check_mark: | Functional              |
-| Formally Verified   | :x:                |                         |
-| Exhaustively Tested | :x:                |                         |
 | Production-Ready    | :heavy_check_mark: |                         |
+| Formally Verified   | Partially          | [Status](#verification) |
+| Exhaustively Tested | Partially          | [Status](#verification) |
 
 ## Feature Roadmap
 - Benchmark performance vs other libraries
@@ -82,7 +85,9 @@ application to do so.
 1. Create an output folder for an out-of-source build
 
 2. `cd` to the output folder and invoke cmake with appropriate options.
-    - Set `-DADDRESS_SANITIZER=1` or `-DUNDEFINED_SANITIZER=1` if appropriate to build with sanitizers
+    - Set `-DASAN=1`, `-DMSAN=1`, or `-DUBSAN=1` build with Address Sanitizer,
+      Memory Sanitizer, or Undefined Behavior Sanitizer respectively. Requires
+      compiler support for the corresponding `-fsanitize` flags.
     - Set `-DENABLE_TESTING=0` if building tests is not desired
     - Set `-DENABLE_PEDANTIC_OPTS=0` if building with a compiler that does not support the following flags:
       - `-Wall -Werror -Wextra -Wno-unused-parameter -pedantic`
@@ -218,6 +223,25 @@ the corresponding CRC definitions.
 
 2. `make check` or `ctest` to run tests
 
+# Verification
+
+Verification of SimpleCRC is ongoing. The current strategy is to take a
+multi-layered approach to verification and use established tools to validate
+individual properties of the library and provide assurance that the
+implementation as a whole is robust.
+
+## Unit Testing
+
+All unit tests are located in `test/` and fall into the following basic types:
+   - db tests
+     - These evaluate all CRCs present in a database. The only currently
+     supported database is the [reveng catalog](https://reveng.sourceforge.io/crc-catalogue/).
+   - Basic tests
+     - These check the basic functionality of the library for debugging purposes.
+   - Exhaustive tests
+     - These test selected algorithms against reference implementations on their
+     complete input space.
+
 ## Fuzzer Testing
 
 SimpleCRC supports fuzzing with libFuzzer by setting the ENABLE_FUZZING flag
@@ -231,6 +255,12 @@ automatically enabled when building tests if the `rv-match` executable is found
 on `PATH` at configuration time. Test cases will be added to validate each of
 the exhaustive test cases and can be run with `make check` or `ctest` as with
 all other tests.
+
+## Formal Proofs
+
+Efforts to formally prove that the library correctly implements supported CRCs
+are underway. The utility functions in crc_utility.c have been partially
+verified, but work remains to be done on validating the core functions.
 
 # Implementation Details
 

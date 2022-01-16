@@ -13,7 +13,7 @@ if(NOT CMAKE_BUILD_TYPE)
 endif()
 
 set(SimpleCrcSources
-    ${PROJECT_SOURCE_DIR}/src/main.c
+    ${PROJECT_SOURCE_DIR}/src/core.c
     ${PROJECT_SOURCE_DIR}/src/crc_utility.c)
 
 set(SimpleCrcHeaders

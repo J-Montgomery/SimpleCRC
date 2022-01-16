@@ -54,10 +54,5 @@ int main(int argc, char **argv)
 
 	DECLARE_TEST(24Q, buf, result);
 
-	// for (int i = 0; i < 256; i++) {
-	// 	printf("0x%08lx, ", table[i] & 0xFFFFFF);
-	// 	if ((i % 4) == 3)
-	// 		putchar('\n');
-	// }
 	return 0;
 }
