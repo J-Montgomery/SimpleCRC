@@ -30,6 +30,8 @@ DECLARE_CRC(CDMA2000_8, 0x9b, 0xff, false, false, 0x00, 0x0, 0xda, 8);
 #if INCLUDE_CRCS_16_31
 DECLARE_CRC(IBM_3740, 0x1021, 0xFFFF, false, false, 0x0, 0x0, 0x29b1, 16);
 DECLARE_CRC(KERMIT, 0x1021, 0x0000, true, true, 0x0, 0x0, 0x2189, 16);
+DECLARE_CRC(LTE_A, 0x864cfb, 0x00, false, false, 0x000000, 0x000000, 0xcde703,
+			24); /* A.K.A CRC-24Q */
 #endif /* INCLUDE_CRCS_16_31 */
 
 #if INCLUDE_CRCS_32_63
