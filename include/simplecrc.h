@@ -9,13 +9,16 @@ extern "C" {
 #include <stdint.h>
 #include <stdbool.h>
 
-#define DECLARE_CRC(NAME, POLY, INIT, REF_IN, REF_OUT, XOR_OUT, RESIDUE,       \
-					CHECK, WIDTH)                                              \
-	struct crc_def CRC_##NAME = (struct crc_def)                               \
-	{                                                                          \
-		.poly = POLY, .init = INIT, .ref_in = REF_IN, .ref_out = REF_OUT,      \
-		.xor_out = XOR_OUT, .residue = RESIDUE, .check = CHECK, .width = WIDTH \
-	}
+#define DECLARE_CRC(NAME, POLY, INIT, REF_IN, REF_OUT, XOR_OUT, RESIDUE, \
+					CHECK, WIDTH)                                        \
+	struct crc_def CRC_##NAME = { .poly = POLY,                          \
+								  .init = INIT,                          \
+								  .ref_in = REF_IN,                      \
+								  .ref_out = REF_OUT,                    \
+								  .xor_out = XOR_OUT,                    \
+								  .residue = RESIDUE,                    \
+								  .check = CHECK,                        \
+								  .width = WIDTH }
 
 struct crc_def {
 	uint64_t poly;
