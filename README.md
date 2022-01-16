@@ -27,6 +27,7 @@ application to do so.
     - [Minimizing Runtime Footprint](#minimizing-runtime-footprint)
 - [Useful Development Rules](#useful-development-rules)
   - [Fuzzer Testing](#fuzzer-testing)
+  - [Abstract Interpretation](#abstract-interpretation)
 - [Implementation Details](#implementation-details)
 
 
@@ -52,6 +53,7 @@ application to do so.
 - Improve db_tests configurability with gtest
 
 ## Resolved
+- ~~Add formal verification into normal tests~~
 - ~~Automated releases CI setup~~
 - ~~C++ library compatibility~~
 - ~~Add convenience header with "common" CRCs~~
@@ -66,13 +68,12 @@ application to do so.
 
 ## Dev Dependencies
 
-* C++ compiler
 * Python3
   * pip
   * requests
   * beautifulsoup4
 * getopt
-* [Verified Software Toolchain](https://vst.cs.princeton.edu/) (optional)
+* [RV-Match](https://github.com/runtimeverification/match) (optional)
 * clang-format (optional)
 * clang-tidy (optional)
 
@@ -222,6 +223,14 @@ the corresponding CRC definitions.
 SimpleCRC supports fuzzing with libFuzzer by setting the ENABLE_FUZZING flag
 for CMake. Extended testing has thus far failed to discover any issues, but
 feel free to explore for yourself.
+
+## Abstract Interpretation
+
+SimpleCRC supports verification with RV-Match. This verification will be
+automatically enabled when building tests if the `rv-match` executable is found
+on `PATH` at configuration time. Test cases will be added to validate each of
+the exhaustive test cases and can be run with `make check` or `ctest` as with
+all other tests.
 
 # Implementation Details
 

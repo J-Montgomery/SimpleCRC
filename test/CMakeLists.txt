@@ -13,6 +13,35 @@ function(CheckPy3Package PackageName)
     endif()
 endfunction()
 
+function(AddRvMatchTest TargetName)
+find_program(RV_MATCH NAMES rv-match)
+if (RV_MATCH)
+    get_target_property(TARGET_SOURCES ${TargetName} SOURCES)
+    get_target_property(TARGET_LIBS ${TargetName} LINK_LIBRARIES)
+
+    # Get the include dirs from each lib we have
+    foreach(LIB ${TARGET_LIBS})
+        get_target_property(LIB_INCLUDES ${LIB} INCLUDE_DIRECTORIES)
+        message(STATUS "incl: " ${LIB_INCLUDES})
+        list(APPEND TARGET_INCLUDES ${LIB_INCLUDES})
+    endforeach()
+
+    # We know all tests will link SimpleCrc, so just append those sources
+    # automatically
+    list(APPEND TARGET_SOURCES ${SimpleCrcSources})
+
+    # Get the absolute path to all sources
+    foreach(SRC ${TARGET_SOURCES})
+        get_filename_component(FPATH ${SRC} ABSOLUTE)
+        list(APPEND ABS_SOURCES ${FPATH})
+    endforeach()
+
+    add_test(NAME "rv-match-${TargetName}" COMMAND
+        rv-match ${ABS_SOURCES} -I ${TARGET_INCLUDES}
+    )
+endif()
+endfunction()
+
 find_package(Python3 COMPONENTS Interpreter)
 CheckPy3Package(pip)
 CheckPy3Package(requests)
@@ -28,6 +57,7 @@ add_custom_target(regen-test-db
         BYPRODUCTS ${CRC_DB_FILE}
     )
 add_custom_target(check COMMAND ${CMAKE_CTEST_COMMAND} --verbose)
+
 
 # Due to CMake issues, this ends up regenerating the catalog every time
 # tests are run. Not sure how to work around this as the byproducts are
@@ -72,13 +102,23 @@ endfunction()
 # 8-15 bit tests
 DefineExhaustiveTest(cdma2000_8_test src/exhaustive_cdma2000_8.c)
 
+AddRvMatchTest(cdma2000_8_test)
+
 # 16-31 bit tests
 DefineExhaustiveTest(kermit_test src/exhaustive_kermit.c)
 DefineExhaustiveTest(ibm3740_test src/exhaustive_ibm3740.c)
+
+AddRvMatchTest(kermit_test)
+AddRvMatchTest(ibm3740_test)
 
 # 32-63 bit tests
 DefineExhaustiveTest(autosar32_test src/exhaustive_autosar32.c)
 DefineExhaustiveTest(gsm_40_test src/exhaustive_gsm40.c)
 
+AddRvMatchTest(autosar32_test)
+AddRvMatchTest(gsm_40_test)
+
 # MISC exhaustive tests
 DefineExhaustiveTest(go_iso_test src/exhaustive_go_iso.c)
+
+AddRvMatchTest(go_iso_test)

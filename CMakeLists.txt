@@ -14,7 +14,7 @@ endif()
 
 set(SimpleCrcSources
     ${PROJECT_SOURCE_DIR}/src/main.c
-    ${PROJECT_SOURCE_DIR}/src/crc_utility)
+    ${PROJECT_SOURCE_DIR}/src/crc_utility.c)
 
 set(SimpleCrcHeaders
     ${PROJECT_SOURCE_DIR}/include/simplecrc.h
