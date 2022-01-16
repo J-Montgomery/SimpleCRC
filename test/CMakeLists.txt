@@ -36,7 +36,8 @@ if (RV_MATCH)
     endforeach()
 
     add_test(NAME "rv-match-${TargetName}" COMMAND
-        rv-match ${ABS_SOURCES} -I ${TARGET_INCLUDES}
+        ${CMAKE_SOURCE_DIR}/scripts/rv-match-invoke.sh
+        ${ABS_SOURCES} -I ${TARGET_INCLUDES}
     )
 endif()
 endfunction()
