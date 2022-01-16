@@ -82,6 +82,9 @@ application to do so.
 
 2. `cd` to the output folder and invoke cmake with appropriate options.
     - Set `-DADDRESS_SANITIZER=1` or `-DUNDEFINED_SANITIZER=1` if appropriate to build with sanitizers
+    - Set `-DENABLE_TESTING=0` if building tests is not desired
+    - Set `-DENABLE_PEDANTIC_OPTS=0` if building with a compiler that does not support the following flags:
+      - `-Wall -Werror -Wextra -Wno-unused-parameter -pedantic`
 
 3. `make` (or other build system invocation)
 

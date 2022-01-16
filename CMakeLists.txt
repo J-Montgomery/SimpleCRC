@@ -24,6 +24,14 @@ set(SimpleCrcHeaders
 set(LibName simplecrc)
 set(IncludeDir ${PROJECT_SOURCE_DIR}/include)
 
+if(NOT ENABLE_PEDANTIC_OPTS)
+    option(ENABLE_PEDANTIC_OPTS "Enable pedantic compiler flags" ON)
+endif()
+
+if(ENABLE_PEDANTIC_OPTS)
+add_compile_options(-Wall -Werror -Wextra -Wno-unused-parameter -pedantic)
+endif()
+
 add_library(${LibName} ${SimpleCrcSources})
 target_include_directories(${LibName} PUBLIC ${IncludeDir})
 
