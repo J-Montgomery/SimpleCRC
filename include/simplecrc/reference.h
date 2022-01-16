@@ -25,6 +25,7 @@ extern "C" {
 
 #if INCLUDE_CRCS_8_15
 DECLARE_CRC(CDMA2000_8, 0x9b, 0xff, false, false, 0x00, 0x0, 0xda, 8);
+DECLARE_CRC(DECT_12, 0x80f, 0x000, false, false, 0x000, 0x0, 0xf5b, 12);
 #endif /* INCLUDE_CRCS_8_15 */
 
 #if INCLUDE_CRCS_16_31

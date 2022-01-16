@@ -100,6 +100,7 @@ endfunction()
 
 # 8-15 bit tests
 DefineExhaustiveTest(cdma2000_8_test src/exhaustive_cdma2000_8.c)
+DefineExhaustiveTest(dect_12_test src/exhaustive_dect_12.c)
 
 # 16-31 bit tests
 DefineExhaustiveTest(kermit_test src/exhaustive_kermit.c)
@@ -119,10 +120,12 @@ AddRvMatchTest(crc_large_test)
 AddRvMatchTest(crc_db_test)
 
 AddRvMatchTest(cdma2000_8_test)
+AddRvMatchTest(dect_12_test)
+
 AddRvMatchTest(kermit_test)
 AddRvMatchTest(ibm3740_test)
 AddRvMatchTest(lte_a_test)
-AddRvMatchTest(autosar32_test)
 
+AddRvMatchTest(autosar32_test)
 AddRvMatchTest(gsm_40_test)
 AddRvMatchTest(go_iso_test)
