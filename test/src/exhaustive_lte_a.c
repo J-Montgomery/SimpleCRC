@@ -23,33 +23,4 @@ uint32_t crc24lte_a_bit(uint32_t crc, void const *mem, size_t len)
 	return crc;
 }
 
-int main(int argc, char **argv)
-{
-	int test_status = EXIT_FAILURE;
-	const size_t buf_size = 256;
-	uintmax_t expected = 0;
-	uintmax_t computed = 0;
-
-	unsigned char *buffer = calloc(buf_size, 1);
-	if (!buffer) {
-		return test_status;
-	}
-
-	// Ensure test buffer checks all values in lookup table
-	fill_test_array(&buffer, buf_size);
-
-	expected = CRCANY_INVOKE_ALGO(crc24lte_a_bit, 24, buffer, buf_size);
-	computed = compute_crc(CRC_LTE_A, buffer, buf_size);
-
-	if (expected == computed) {
-		printf("Test succeeded\n");
-		test_status = EXIT_SUCCESS;
-	} else {
-		fprintf(stderr, "Test failed\nexpected: 0x%lx\ncomputed: 0x%lx\n",
-				expected, computed);
-		test_status = EXIT_FAILURE;
-	}
-
-	free(buffer);
-	return test_status;
-}
+EXHAUSTIVE_CRC_CHECK(CRC_LTE_A, crc24lte_a_bit)
