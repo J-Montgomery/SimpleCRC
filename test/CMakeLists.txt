@@ -81,22 +81,46 @@ if(ENABLE_FUZZING)
     return() # Stop processing further tests
 endif()
 
-add_executable(crc_large_test src/basic_test.c)
-target_link_libraries(crc_large_test ${LibName})
-add_test(crc_large_test crc_large_test)
+#add_executable(crc_large_test src/basic_test.c)
+#target_link_libraries(crc_large_test ${LibName})
+#add_test(crc_large_test crc_large_test)
 
 add_executable(crc_db_test src/db_test.c)
 target_link_libraries(crc_db_test ${LibName})
 add_test(NAME crc_db_test COMMAND
          crc_db_test ${CRC_DB_FILE})
 
-set_tests_properties(crc_large_test crc_db_test PROPERTIES DEPENDS ${CRC_DB_FILE})
+set_tests_properties(crc_db_test PROPERTIES DEPENDS ${CRC_DB_FILE})
 
 function(DefineExhaustiveTest TestName TestFile)
     add_executable(${TestName} ${TestFile})
     target_link_libraries(${TestName} ${LibName})
     add_test(${TestName} ${TestName})
 endfunction()
+
+function(DefineBasicTest TestName TestFile)
+    add_executable(${TestName} ${TestFile})
+    target_link_libraries(${TestName} ${LibName})
+    add_test(${TestName} ${TestName})
+endfunction()
+
+DefineBasicTest(basic_24q_test src/basic_24q.c)
+DefineBasicTest(basic_autosar32_test src/basic_autosar_32.c)
+DefineBasicTest(basic_can_fd_test src/basic_can_fd.c)
+
+DefineBasicTest(basic_cdma_2000_test src/basic_cdma_2000.c)
+DefineBasicTest(basic_darc_test src/basic_darc.c)
+DefineBasicTest(basic_dect_12_test src/basic_dect_12.c)
+
+DefineBasicTest(basic_go_iso_test src/basic_go_iso.c)
+DefineBasicTest(basic_gsm_40_test src/basic_gsm_40.c)
+DefineBasicTest(basic_ibm_3740_test src/basic_ibm_3740.c)
+
+DefineBasicTest(basic_iso_14443_test src/basic_iso_14443.c)
+DefineBasicTest(basic_kermit_test src/basic_kermit.c)
+DefineBasicTest(basic_maxim_dow_test src/basic_maxim_dow.c)
+
+DefineBasicTest(basic_usb_16_test src/basic_usb_16.c)
 
 # 8-15 bit tests
 DefineExhaustiveTest(cdma2000_8_test src/exhaustive_cdma2000_8.c)
@@ -116,7 +140,24 @@ DefineExhaustiveTest(go_iso_test src/exhaustive_go_iso.c)
 
 
 # rv-match verification tests
-AddRvMatchTest(crc_large_test)
+AddRvMatchTest(basic_24q_test)
+AddRvMatchTest(basic_autosar32_test)
+AddRvMatchTest(basic_can_fd_test)
+
+AddRvMatchTest(basic_cdma_2000_test)
+AddRvMatchTest(basic_darc_test)
+AddRvMatchTest(basic_dect_12_test)
+
+AddRvMatchTest(basic_go_iso_test)
+AddRvMatchTest(basic_gsm_40_test)
+AddRvMatchTest(basic_ibm_3740_test)
+
+AddRvMatchTest(basic_iso_14443_test)
+AddRvMatchTest(basic_kermit_test)
+AddRvMatchTest(basic_maxim_dow_test)
+
+AddRvMatchTest(basic_usb_16_test)
+
 AddRvMatchTest(crc_db_test)
 
 AddRvMatchTest(cdma2000_8_test)
