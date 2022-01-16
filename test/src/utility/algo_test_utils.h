@@ -4,13 +4,12 @@
 #include <stddef.h>
 #include <stdint.h>
 
-#define CRCANY_INVOKE_ALGO(func, bitwidth, buf, buf_size)                \
-	({                                                                   \
-		uintmax_t crc_null = func(0, NULL, 0);                           \
-		uintmax_t init = crc_null |                                      \
-						 ~((((uintmax_t)1 << (bitwidth - 1)) << 1) - 1); \
-		func(init, buf, buf_size);                                       \
-	})
+/* This macro would look nicer as a braced-expression, but that isn't allowed in
+ * ISO C. See the git history
+ */
+#define CRCANY_INVOKE_ALGO(func, bitwidth, buf, buf_size)                     \
+	func((func(0, NULL, 0) | ~((((uintmax_t)1 << (bitwidth - 1)) << 1) - 1)), \
+		 buf, buf_size)
 
 void fill_test_array(unsigned char **buf, size_t buf_size)
 {
