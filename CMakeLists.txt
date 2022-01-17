@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.10)
-project(simplecrc VERSION 3.0.0 LANGUAGES C
+project(simplecrc VERSION 3.1.0 LANGUAGES C
         DESCRIPTION "Simple CRC library")
 
 set(CMAKE_C_STANDARD 11)
@@ -13,8 +13,8 @@ if(NOT CMAKE_BUILD_TYPE)
 endif()
 
 set(SimpleCrcSources
-    ${PROJECT_SOURCE_DIR}/src/main.c
-    ${PROJECT_SOURCE_DIR}/src/crc_utility)
+    ${PROJECT_SOURCE_DIR}/src/core.c
+    ${PROJECT_SOURCE_DIR}/src/crc_utility.c)
 
 set(SimpleCrcHeaders
     ${PROJECT_SOURCE_DIR}/include/simplecrc.h
@@ -23,6 +23,14 @@ set(SimpleCrcHeaders
 
 set(LibName simplecrc)
 set(IncludeDir ${PROJECT_SOURCE_DIR}/include)
+
+if(NOT ENABLE_PEDANTIC_OPTS)
+    option(ENABLE_PEDANTIC_OPTS "Enable pedantic compiler flags" ON)
+endif()
+
+if(ENABLE_PEDANTIC_OPTS)
+add_compile_options(-Wall -Werror -Wextra -Wno-unused-parameter -pedantic)
+endif()
 
 add_library(${LibName} ${SimpleCrcSources})
 target_include_directories(${LibName} PUBLIC ${IncludeDir})

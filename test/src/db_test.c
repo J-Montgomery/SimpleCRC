@@ -9,13 +9,6 @@
 #define xstr(a) str(a)
 #define str(a) #a
 
-#define min(a, b)               \
-	({                          \
-		__typeof__(a) _a = (a); \
-		__typeof__(b) _b = (b); \
-		_a < _b ? _a : _b;      \
-	})
-
 struct test_definition {
 	char test_name[32];
 	struct crc_def params;
@@ -38,16 +31,18 @@ int run_crc_check(struct test_definition def)
 
 struct test_definition get_crc_def(char *line, int *errors)
 {
-	char *token;
 	char *strptr = line;
 	struct test_definition def = { 0 };
 	int iteration = 0;
-	while ((token = strsep(&strptr, " ")) != NULL) {
-		//printf("%s\n", token);
+	char *token = strtok(strptr, " ");
+	while (token != NULL) {
 		switch (iteration) {
 		case 0: // Algorithm name
 		{
-			memcpy(def.test_name, token, min(32, strlen(token)));
+			size_t copy_size = strlen(token);
+			if (copy_size > 32)
+				copy_size = 32;
+			memcpy(def.test_name, token, copy_size);
 			break;
 		}
 		case 1: // CRC width
@@ -147,7 +142,9 @@ struct test_definition get_crc_def(char *line, int *errors)
 			*errors = EINVAL;
 			return def;
 		}
+
 		iteration += 1;
+		token = strtok(NULL, " ");
 	}
 
 	return def;
