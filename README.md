@@ -259,8 +259,8 @@ all other tests.
 ## Formal Proofs
 
 Efforts to formally prove that the library correctly implements supported CRCs
-are underway. The utility functions in crc_utility.c have been partially
-verified, but work remains to be done on validating the core functions.
+are underway. The utility functions in crc_utility.c have been formally proven,
+but work remains to be done on validating the core functions.
 
 # Implementation Details
 
