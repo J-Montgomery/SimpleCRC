@@ -33,9 +33,6 @@ struct crc_def {
 
 uint64_t compute_crc(struct crc_def params, const unsigned char *buf,
 					 size_t len);
-bool precompute_crc_table(struct crc_def params, uint64_t **table, size_t len);
-uint64_t compute_crc_fast(struct crc_def params, const unsigned char *buf,
-						  size_t len, const uint64_t *table);
 
 #ifdef __cplusplus
 }
