@@ -2,7 +2,7 @@
 #include <simplecrc.h>
 #include <cstring>
 
-DECLARE_CRC(TEST, 0x1021, 0x0000, false, false, 0x0, 0x0, 0x2189, 16);
+DECLARE_CRC(TEST, 0x1021, 0x0000, true, true, 0x0, 0x0, 0x2189, 16);
 
 #define TABLE_LEN (256)
 
@@ -100,7 +100,6 @@ uint64_t compute_crc_old(struct crc_def params, const unsigned char *buf,
 	return compute_crc_fast(params, buf, len, internal_table);
 }
 
-// Define another benchmark
 static void BM_CrcTable_Original(benchmark::State& state) {
     unsigned char* msg = new unsigned char[state.range(0)];
     uint64_t* tbl = new uint64_t[TABLE_LEN];
@@ -118,7 +117,6 @@ static void BM_CrcTable_Original(benchmark::State& state) {
 }
 BENCHMARK(BM_CrcTable_Original)->Arg(8)->Arg(64)->Arg(512)->Arg(1<<10)->Arg(8<<10);
 
-// Define another benchmark
 static void BM_CrcCombined_Original(benchmark::State& state) {
     unsigned char* msg = new unsigned char[state.range(0)];
 
@@ -133,7 +131,6 @@ static void BM_CrcCombined_Original(benchmark::State& state) {
 }
 BENCHMARK(BM_CrcCombined_Original)->Arg(8)->Arg(64)->Arg(512)->Arg(1<<10)->Arg(8<<10);
 
-// Define another benchmark
 static void BM_Crc_NoTable_Proved(benchmark::State& state) {
     unsigned char* msg = new unsigned char[state.range(0)];
     memset(msg, 'x', state.range(0));
