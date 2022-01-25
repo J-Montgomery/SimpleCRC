@@ -92,7 +92,7 @@ uint64_t compute_crc_fast(struct crc_def params, const unsigned char *buf,
 }
 
 uint64_t compute_crc_old(struct crc_def params, const unsigned char *buf,
-					 size_t len)
+						 size_t len)
 {
 	uint64_t *tbl_ptr = internal_table;
 
@@ -100,48 +100,69 @@ uint64_t compute_crc_old(struct crc_def params, const unsigned char *buf,
 	return compute_crc_fast(params, buf, len, internal_table);
 }
 
-static void BM_CrcTable_Original(benchmark::State& state) {
-    unsigned char* msg = new unsigned char[state.range(0)];
-    uint64_t* tbl = new uint64_t[TABLE_LEN];
+static void BM_CrcTable_Original(benchmark::State &state)
+{
+	unsigned char *msg = new unsigned char[state.range(0)];
+	uint64_t *tbl = new uint64_t[TABLE_LEN];
 
-    memset(msg, 'x', state.range(0));
-    precompute_crc_table(CRC_TEST, &tbl, TABLE_LEN * sizeof(uint64_t));
+	memset(msg, 'x', state.range(0));
+	precompute_crc_table(CRC_TEST, &tbl, TABLE_LEN * sizeof(uint64_t));
 
-    for (auto _ : state) {
-        compute_crc_fast(CRC_TEST, msg, state.range(0), tbl);
-    }
+	for (auto _ : state) {
+		compute_crc_fast(CRC_TEST, msg, state.range(0), tbl);
+	}
 
-    state.SetBytesProcessed(int64_t(state.iterations()) * int64_t(state.range(0)));
-    delete[] msg;
-    delete[] tbl;
+	state.SetBytesProcessed(int64_t(state.iterations()) *
+							int64_t(state.range(0)));
+	delete[] msg;
+	delete[] tbl;
 }
-BENCHMARK(BM_CrcTable_Original)->Arg(8)->Arg(64)->Arg(512)->Arg(1<<10)->Arg(8<<10);
+BENCHMARK(BM_CrcTable_Original)
+	->Arg(8)
+	->Arg(64)
+	->Arg(512)
+	->Arg(1 << 10)
+	->Arg(8 << 10);
 
-static void BM_CrcCombined_Original(benchmark::State& state) {
-    unsigned char* msg = new unsigned char[state.range(0)];
+static void BM_CrcCombined_Original(benchmark::State &state)
+{
+	unsigned char *msg = new unsigned char[state.range(0)];
 
-    memset(msg, 'x', state.range(0));
+	memset(msg, 'x', state.range(0));
 
-    for (auto _ : state) {
-        compute_crc_old(CRC_TEST, msg, state.range(0));
-    }
+	for (auto _ : state) {
+		compute_crc_old(CRC_TEST, msg, state.range(0));
+	}
 
-    state.SetBytesProcessed(int64_t(state.iterations()) * int64_t(state.range(0)));
-    delete[] msg;
+	state.SetBytesProcessed(int64_t(state.iterations()) *
+							int64_t(state.range(0)));
+	delete[] msg;
 }
-BENCHMARK(BM_CrcCombined_Original)->Arg(8)->Arg(64)->Arg(512)->Arg(1<<10)->Arg(8<<10);
+BENCHMARK(BM_CrcCombined_Original)
+	->Arg(8)
+	->Arg(64)
+	->Arg(512)
+	->Arg(1 << 10)
+	->Arg(8 << 10);
 
-static void BM_Crc_NoTable_Proved(benchmark::State& state) {
-    unsigned char* msg = new unsigned char[state.range(0)];
-    memset(msg, 'x', state.range(0));
+static void BM_Crc_NoTable_Proved(benchmark::State &state)
+{
+	unsigned char *msg = new unsigned char[state.range(0)];
+	memset(msg, 'x', state.range(0));
 
-    for (auto _ : state) {
-        compute_crc(CRC_TEST, msg, state.range(0));
-    }
+	for (auto _ : state) {
+		compute_crc(CRC_TEST, msg, state.range(0));
+	}
 
-    state.SetBytesProcessed(int64_t(state.iterations()) * int64_t(state.range(0)));
-    delete[] msg;
+	state.SetBytesProcessed(int64_t(state.iterations()) *
+							int64_t(state.range(0)));
+	delete[] msg;
 }
-BENCHMARK(BM_Crc_NoTable_Proved)->Arg(8)->Arg(64)->Arg(512)->Arg(1<<10)->Arg(8<<10);
+BENCHMARK(BM_Crc_NoTable_Proved)
+	->Arg(8)
+	->Arg(64)
+	->Arg(512)
+	->Arg(1 << 10)
+	->Arg(8 << 10);
 
 BENCHMARK_MAIN();

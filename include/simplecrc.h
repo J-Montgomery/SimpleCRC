@@ -11,14 +11,16 @@ extern "C" {
 
 #define DECLARE_CRC(NAME, POLY, INIT, REF_IN, REF_OUT, XOR_OUT, RESIDUE, \
 					CHECK, WIDTH)                                        \
-	struct crc_def CRC_##NAME = { .poly = POLY,                          \
-								  .init = INIT,                          \
-								  .xor_out = XOR_OUT,                    \
-								  .residue = RESIDUE,                    \
-								  .check = CHECK,                        \
-								  .width = WIDTH,                        \
-								  .ref_in = REF_IN,                      \
-								  .ref_out = REF_OUT,                    }
+	struct crc_def CRC_##NAME = {                                        \
+		.poly = POLY,                                                    \
+		.init = INIT,                                                    \
+		.xor_out = XOR_OUT,                                              \
+		.residue = RESIDUE,                                              \
+		.check = CHECK,                                                  \
+		.width = WIDTH,                                                  \
+		.ref_in = REF_IN,                                                \
+		.ref_out = REF_OUT,                                              \
+	}
 
 struct crc_def {
 	uint64_t poly;
