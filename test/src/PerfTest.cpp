@@ -2,7 +2,7 @@
 #include <simplecrc.h>
 #include <cstring>
 
-DECLARE_CRC(KERMIT, 0x1021, 0x0000, true, true, 0x0, 0x0, 0x2189, 16);
+DECLARE_CRC(TEST, 0x1021, 0x0000, false, false, 0x0, 0x0, 0x2189, 16);
 
 #define TABLE_LEN (256)
 
@@ -101,50 +101,50 @@ uint64_t compute_crc_old(struct crc_def params, const unsigned char *buf,
 }
 
 // Define another benchmark
-static void BM_CrcFastOld(benchmark::State& state) {
+static void BM_CrcTable_Original(benchmark::State& state) {
     unsigned char* msg = new unsigned char[state.range(0)];
     uint64_t* tbl = new uint64_t[TABLE_LEN];
 
     memset(msg, 'x', state.range(0));
-    precompute_crc_table(CRC_KERMIT, &tbl, TABLE_LEN * sizeof(uint64_t));
+    precompute_crc_table(CRC_TEST, &tbl, TABLE_LEN * sizeof(uint64_t));
 
     for (auto _ : state) {
-        compute_crc_fast(CRC_KERMIT, msg, state.range(0), tbl);
+        compute_crc_fast(CRC_TEST, msg, state.range(0), tbl);
     }
 
     state.SetBytesProcessed(int64_t(state.iterations()) * int64_t(state.range(0)));
     delete[] msg;
     delete[] tbl;
 }
-BENCHMARK(BM_CrcFastOld)->Arg(8)->Arg(64)->Arg(512)->Arg(1<<10)->Arg(8<<10);
+BENCHMARK(BM_CrcTable_Original)->Arg(8)->Arg(64)->Arg(512)->Arg(1<<10)->Arg(8<<10);
 
 // Define another benchmark
-static void BM_CrcSlowOld(benchmark::State& state) {
+static void BM_CrcCombined_Original(benchmark::State& state) {
     unsigned char* msg = new unsigned char[state.range(0)];
 
     memset(msg, 'x', state.range(0));
 
     for (auto _ : state) {
-        compute_crc_old(CRC_KERMIT, msg, state.range(0));
+        compute_crc_old(CRC_TEST, msg, state.range(0));
     }
 
     state.SetBytesProcessed(int64_t(state.iterations()) * int64_t(state.range(0)));
     delete[] msg;
 }
-BENCHMARK(BM_CrcSlowOld)->Arg(8)->Arg(64)->Arg(512)->Arg(1<<10)->Arg(8<<10);
+BENCHMARK(BM_CrcCombined_Original)->Arg(8)->Arg(64)->Arg(512)->Arg(1<<10)->Arg(8<<10);
 
 // Define another benchmark
-static void BM_CrcNew(benchmark::State& state) {
+static void BM_Crc_NoTable_Proved(benchmark::State& state) {
     unsigned char* msg = new unsigned char[state.range(0)];
     memset(msg, 'x', state.range(0));
 
     for (auto _ : state) {
-        compute_crc(CRC_KERMIT, msg, state.range(0));
+        compute_crc(CRC_TEST, msg, state.range(0));
     }
 
     state.SetBytesProcessed(int64_t(state.iterations()) * int64_t(state.range(0)));
     delete[] msg;
 }
-BENCHMARK(BM_CrcNew)->Arg(8)->Arg(64)->Arg(512)->Arg(1<<10)->Arg(8<<10);
+BENCHMARK(BM_Crc_NoTable_Proved)->Arg(8)->Arg(64)->Arg(512)->Arg(1<<10)->Arg(8<<10);
 
 BENCHMARK_MAIN();
