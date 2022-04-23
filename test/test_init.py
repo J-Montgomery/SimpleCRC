@@ -33,6 +33,8 @@ def write_file(fp, definitions):
 
     for crc in definitions:
         string_def = def_format.format(**crc._asdict())
+        if crc.refin != crc.refout:
+            print("CRC mismatch detected: ", string_def)
         fp.write(string_def)
     return
 

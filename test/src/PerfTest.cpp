@@ -2,7 +2,7 @@
 #include <simplecrc.h>
 #include <cstring>
 
-DECLARE_CRC(TEST, 0x1021, 0x0000, true, true, 0x0, 0x0, 0x2189, 16);
+DECLARE_CRC(TEST, 0x1021, 0x0000, false, false, 0x0, 0x0, 0x2189, 16);
 
 #define TABLE_LEN (256)
 
