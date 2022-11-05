@@ -14,6 +14,7 @@ endif()
 
 set(SimpleCrcSources
     ${PROJECT_SOURCE_DIR}/src/core.c
+    ${PROJECT_SOURCE_DIR}/src/crc_combine.c
     ${PROJECT_SOURCE_DIR}/src/crc_utility.c)
 
 set(SimpleCrcHeaders

@@ -105,6 +105,8 @@ function(DefineBasicTest TestName TestFile)
     add_test(${TestName} ${TestName})
 endfunction()
 
+DefineBasicTest(combine_basic_test src/combine_basic_test.c)
+
 DefineBasicTest(basic_24q_test src/basic_24q.c)
 DefineBasicTest(basic_autosar32_test src/basic_autosar_32.c)
 DefineBasicTest(basic_can_fd_test src/basic_can_fd.c)
